@@ -1,9 +1,9 @@
 # ==============================================
 # ✨ BECCA STYLE & DESIGN ✨
-# Analyse de Données - Haute Couture
-# Projet ETUDE EC2
-# TOUBIWO ANGE BECCA
+# Haute Couture & Créations
+# Plateforme d'Analyse de Données
 # ==============================================
+
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -15,7 +15,7 @@ from datetime import datetime
 
 # -------------------- CONFIGURATION DE LA PAGE --------------------
 st.set_page_config(
-    page_title="Becca Style & Design | Analyse de Données",
+    page_title="Becca Style & Design | Pilotage",
     page_icon="📊",
     layout="wide"
 )
@@ -70,16 +70,16 @@ st.markdown("""
 # -------------------- BARRE LATÉRALE --------------------
 with st.sidebar:
     st.markdown("### BECCA STYLE & DESIGN")
-    st.markdown("Direction de l'Analyse Stratégique")
+    st.markdown("*Direction de l'Analyse Stratégique*")
     st.markdown("---")
     st.markdown(f"📅 {datetime.now().strftime('%d/%m/%Y')}")
     st.markdown("---")
-    st.markdown("*Responsable :* TOUBIWO ANGE BECCA")
-    st.markdown("*Projet :* TP INF232 EC2")
+    st.markdown("**Responsable :** Rebecca TOUBIWO")
+    st.markdown("*Fondatrice & Directrice Artistique*")
 
 # -------------------- TITRE --------------------
 st.title("BECCA STYLE & DESIGN")
-st.markdown("### Plateforme d'Analyse de Données - Module de Gestion des Ateliers")
+st.markdown("### Plateforme de Pilotage - Gestion des Ateliers")
 st.markdown("---")
 
 # -------------------- CHEMIN DU FICHIER DE DONNÉES --------------------
@@ -123,16 +123,16 @@ col1, col2 = st.columns([1, 2])
 # ==============================================
 with col1:
     st.subheader("Saisie des Commandes")
-    st.markdown("Formulaire de collecte terrain")
+    st.markdown("*Formulaire de collecte terrain*")
     
     with st.form("formulaire_commande", clear_on_submit=True):
         atelier = st.selectbox("Atelier", ATELIERS)
         prenom = st.text_input("Identifiant Client")
-        age = st.number_input("Age", min_value=15, max_value=90, value=30, step=1)
+        age = st.number_input("Âge", min_value=15, max_value=90, value=30, step=1)
         type_tenue = st.selectbox("Type de Tenue", TYPES_TENUES)
         tissu = st.selectbox("Tissu Principal", TISSUS)
         budget = st.number_input("Budget Total (FCFA)", min_value=10000, max_value=2000000, value=150000, step=10000)
-        delai = st.number_input("Delai de Confection (jours)", min_value=1, max_value=90, value=14, step=1)
+        delai = st.number_input("Délai de Confection (jours)", min_value=1, max_value=90, value=14, step=1)
         satisfaction = st.slider("Score de Satisfaction", 1, 5, 4)
         recommandation = st.radio("Recommanderait l'atelier ?", ["Oui", "Non"], horizontal=True)
         
@@ -146,22 +146,19 @@ with col1:
                     "delai": delai, "satisfaction": satisfaction, "recommandation": recommandation
                 }])
                 sauvegarder_commande(nouvelle_ligne)
-                st.success(f"Commande enregistrée avec succès.")
-                st.balloons()
+                st.success("Commande enregistrée avec succès.")
 
 # ==============================================
 # PARTIE DROITE : MODULE D'ANALYSE
 # ==============================================
 with col2:
-    st.subheader("Module d'Analyse Des Données")
+    st.subheader("Analyse des Données")
     
     df = charger_donnees()
     
     if df.empty:
-        st.warning("Aucune donnée collectée. Veuillez remplir le formulaire de collecte pour alimenter les analyses.")
-        # On met un jeu de données exemple pour une première visualisation
-        st.info("Affichage des analyses avec un jeu de données exemple.")
-        # Créer des données exemple
+        st.warning("Aucune donnée collectée. Veuillez remplir le formulaire pour alimenter les analyses.")
+        st.info("Affichage avec un jeu de données exemple.")
         dates = pd.date_range(start="2026-01-01", periods=50, freq='7D')
         ateliers_ex = np.random.choice(ATELIERS, 50)
         budgets_ex = np.random.normal(150000, 50000, 50).astype(int)
@@ -173,7 +170,7 @@ with col2:
         })
     
     # ----- INDICATEURS CLES -----
-    st.markdown("#### Indicateurs de Performance Clés")
+    st.markdown("#### Indicateurs de Performance")
     kpi1, kpi2, kpi3, kpi4 = st.columns(4)
     with kpi1:
         st.metric("Total Commandes", len(df))
@@ -187,23 +184,19 @@ with col2:
     
     st.markdown("---")
     
-    # ----- ANALYSES AVANCEES (EC2) -----
-    tab_ec2, tab_brutes = st.tabs(["Analyses EC2", "Données Brutes"])
+    # ----- ANALYSES -----
+    tab_analyse, tab_brutes = st.tabs(["Analyse Approfondie", "Données Brutes"])
     
-    with tab_ec2:
-        st.markdown("### Analyse de Données du Cours EC2")
-        
-        # 1. DISTRIBUTION DES BUDGETS
-        st.markdown("#### Distribution et Effectif Cumulé des Budgets")
+    with tab_analyse:
+        st.markdown("### Distribution des Budgets")
         fig1, ax1 = plt.subplots(figsize=(8, 4))
-        ax1.hist(df['budget'], bins=20, color='#2C3E50', edgecolor='white', alpha=0.7, label='Effectif par tranche')
+        ax1.hist(df['budget'], bins=20, color='#2C3E50', edgecolor='white', alpha=0.7)
         ax1.set_xlabel("Budget (FCFA)")
         ax1.set_ylabel("Effectif")
-        ax1.set_title("Histogramme de la distribution des budgets")
         st.pyplot(fig1)
         
-        # 2. COURBE DE REGRESSION (BUDGET VS SATISFACTION)
-        st.markdown("#### Régression Linéaire : Budget vs Satisfaction Client")
+        st.markdown("---")
+        st.markdown("### Corrélation : Budget Investi vs Satisfaction Client")
         fig2, ax2 = plt.subplots(figsize=(8, 4))
         x = df['budget']
         y = df['satisfaction']
@@ -213,33 +206,33 @@ with col2:
             slope, intercept, r_value, p_value, std_err = stats.linregress(x, y)
             line = slope * x + intercept
             ax2.plot(x, line, color='red', linewidth=2)
-            ax2.annotate(f'y={slope:.4f}x+{intercept:.2f}\nR²={r_value**2:.2f}', xy=(0.05, 0.9), xycoords='axes fraction', bbox=dict(facecolor='yellow', alpha=0.5))
+            ax2.annotate(f'y={slope:.4f}x+{intercept:.2f}\nR²={r_value**2:.3f}', 
+                        xy=(0.05, 0.9), xycoords='axes fraction', 
+                        fontsize=11, bbox=dict(facecolor='white', alpha=0.8))
         
         ax2.set_xlabel("Budget (FCFA)")
         ax2.set_ylabel("Score de Satisfaction")
-        ax2.set_title("Analyse de Corrélation : Budget investi et Satisfaction")
         st.pyplot(fig2)
-        st.caption("Cette courbe de régression permet de comprendre si un budget plus élevé est statistiquement lié à une meilleure satisfaction client.\n- R² s'approche de 1 : Forte corrélation\n- R² s'approche de 0 : Aucune corrélation")
+        st.caption("Cette analyse permet de comprendre si un budget plus élevé est statistiquement lié à une meilleure satisfaction client. Un R² proche de 1 indique une forte corrélation, un R² proche de 0 indique une absence de corrélation.")
         
-        # 3. ANALYSE DES TOP PERFORMERS
-        st.markdown("#### Performance Comparative des Ateliers")
+        st.markdown("---")
+        st.markdown("### Performance Comparative des Ateliers")
         fig3, ax3 = plt.subplots(figsize=(8, 4))
         atelier_perf = df.groupby('atelier').agg({'satisfaction': 'mean', 'budget': 'count'}).reset_index()
         ax3.bar(atelier_perf['atelier'], atelier_perf['satisfaction'], color='#34495E')
         ax3.set_xlabel("Atelier")
         ax3.set_ylabel("Score de Satisfaction Moyen")
-        ax3.set_title("Satisfaction Moyenne par Atelier (Analyse Comparative)")
+        plt.xticks(rotation=45, ha='right')
         st.pyplot(fig3)
     
     with tab_brutes:
-        st.subheader("Base de Données Brutes")
+        st.subheader("Base de Données")
         st.dataframe(df.sort_values('date', ascending=False), use_container_width=True)
 
 # -------------------- PIED DE PAGE --------------------
 st.markdown("---")
 st.markdown("""
     <div style='text-align: center; color: grey; font-size: 12px; margin-top: 20px;'>
-        <p>© 2026 <b>Becca Style & Design</b> - Module d'Analyse EC2</p>
-        <p>TP INF232 EC2 - TOUBIWO ANGE BECCA</p>
+        <p>© 2026 <b>Becca Style & Design</b> - Tous droits réservés</p>
     </div>
 """, unsafe_allow_html=True)
