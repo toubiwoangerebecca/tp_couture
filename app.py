@@ -7,6 +7,13 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import plotly.express as px
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+from sklearn.cluster import KMeans
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import r2_score
 import os
 from datetime import datetime
 
@@ -38,10 +45,10 @@ st.markdown("""
         background: linear-gradient(135deg, #800020, #CD5C5C) !important;
         color: white !important;
         font-weight: bold !important;
-        font-size: 1.0rem !important;
+        font-size: 0.85rem !important;
         border: none !important;
-        border-radius: 10px !important;
-        padding: 10px 20px !important;
+        border-radius: 8px !important;
+        padding: 8px 12px !important;
         transition: all 0.3s ease !important;
         white-space: nowrap !important;
     }
@@ -278,27 +285,33 @@ with col2:
     
     st.markdown("---")
     
-    # ----- MENU ALIGNÉ -----
-    col_menu1, col_menu2, col_menu3 = st.columns(3)
+    # ----- MENU ALIGNÉ (5 boutons) -----
+    col_menu1, col_menu2, col_menu3, col_menu4, col_menu5 = st.columns(5)
     
     with col_menu1:
-        if st.button("Corrélation & Tendances", use_container_width=True, key="btn_corr"):
-            st.session_state['section'] = 'correlation'
+        if st.button("Tendances", use_container_width=True, key="btn_tend"):
+            st.session_state['section'] = 'tendances'
     with col_menu2:
-        if st.button("Performance Ateliers", use_container_width=True, key="btn_perf"):
-            st.session_state['section'] = 'performance'
+        if st.button("Régression", use_container_width=True, key="btn_reg"):
+            st.session_state['section'] = 'regression'
     with col_menu3:
-        if st.button("Données Brutes", use_container_width=True, key="btn_data"):
-            st.session_state['section'] = 'donnees'
+        if st.button("PCA", use_container_width=True, key="btn_pca"):
+            st.session_state['section'] = 'pca'
+    with col_menu4:
+        if st.button("Classification", use_container_width=True, key="btn_class"):
+            st.session_state['section'] = 'classification'
+    with col_menu5:
+        if st.button("Clustering", use_container_width=True, key="btn_clust"):
+            st.session_state['section'] = 'clustering'
     
     if 'section' not in st.session_state:
-        st.session_state['section'] = 'correlation'
+        st.session_state['section'] = 'tendances'
     
     st.markdown("---")
     
     # ----- AFFICHAGE SELON LA SECTION -----
-    if st.session_state['section'] == 'correlation':
-        st.markdown("### Corrélation & Tendances")
+    if st.session_state['section'] == 'tendances':
+        st.markdown("### Tendances & Camemberts")
         colA, colB = st.columns(2)
         with colA:
             st.markdown("#### Top 5 des Tissus")
@@ -316,31 +329,12 @@ with col2:
                 couleurs = ['#800020', '#CD5C5C', '#D4A574', '#8B6F47', '#6B8E23']
                 ax2.pie(top_tenues.values, labels=top_tenues.index, autopct='%1.1f%%', colors=couleurs)
                 st.pyplot(fig2)
-        st.markdown("#### Corrélation : Budget vs Satisfaction")
-        fig3, ax3 = plt.subplots(figsize=(8, 4))
-        x = df['budget'].values
-        y = df['satisfaction'].values
-        ax3.scatter(x, y, alpha=0.6, color='#800020', s=80)
-        ax3.set_xlabel("Budget (FCFA)")
-        ax3.set_ylabel("Satisfaction")
-        if len(x) > 1:
-            A = np.vstack([x, np.ones(len(x))]).T
-            pente, intercept = np.linalg.lstsq(A, y, rcond=None)[0]
-            ax3.plot(x, pente * x + intercept, color='red', linewidth=2)
-            y_pred = pente * x + intercept
-            ss_res = np.sum((y - y_pred) ** 2)
-            ss_tot = np.sum((y - np.mean(y)) ** 2)
-            r2 = 1 - (ss_res / ss_tot)
-            ax3.set_title(f"Régression Linéaire | R² = {r2:.3f}")
-        st.pyplot(fig3)
-    
-    elif st.session_state['section'] == 'performance':
-        st.markdown("### Performance Ateliers")
+        st.markdown("#### Performance Ateliers")
         colC, colD = st.columns(2)
         with colC:
-            st.markdown("#### Satisfaction par Atelier")
+            st.markdown("##### Satisfaction par Atelier")
             satisf_atelier = df.groupby('atelier')['satisfaction'].mean().sort_values(ascending=False)
-            fig4, ax4 = plt.subplots(figsize=(6, 4))
+            fig4, ax4 = plt.subplots(figsize=(5, 4))
             couleurs = ['#800020', '#CD5C5C', '#D4A574', '#8B6F47', '#6B8E23']
             bars = ax4.bar(satisf_atelier.index, satisf_atelier.values, color=couleurs)
             ax4.set_ylabel('Satisfaction (/5)')
@@ -350,21 +344,107 @@ with col2:
                 ax4.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.05, f'{val:.1f}', ha='center', fontweight='bold')
             st.pyplot(fig4)
         with colD:
-            st.markdown("#### Commandes par Atelier")
+            st.markdown("##### Commandes par Atelier")
             cmd_atelier = df['atelier'].value_counts()
-            fig5, ax5 = plt.subplots(figsize=(6, 4))
+            fig5, ax5 = plt.subplots(figsize=(5, 4))
             bars = ax5.bar(cmd_atelier.index, cmd_atelier.values, color=couleurs[:len(cmd_atelier)])
             ax5.set_ylabel('Nombre de Commandes')
             plt.xticks(rotation=45, ha='right')
             for bar, val in zip(bars, cmd_atelier.values):
                 ax5.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.1, str(val), ha='center', fontweight='bold')
             st.pyplot(fig5)
-    
-    elif st.session_state['section'] == 'donnees':
-        st.markdown("### Données Brutes")
+        st.markdown("#### Données Brutes")
         st.dataframe(df.sort_values('date', ascending=False), use_container_width=True)
         csv = df.to_csv(index=False).encode('utf-8')
         st.download_button("Télécharger (CSV)", data=csv, file_name='becca_export.csv', mime='text/csv')
+    
+    elif st.session_state['section'] == 'regression':
+        st.markdown("### Régression Linéaire")
+        tab_reg1, tab_reg2 = st.tabs(["Régression Simple", "Régression Multiple"])
+        
+        with tab_reg1:
+            st.markdown("#### Budget vs Satisfaction")
+            fig, ax = plt.subplots(figsize=(8, 4))
+            x = df['budget'].values
+            y = df['satisfaction'].values
+            ax.scatter(x, y, alpha=0.6, color='#800020', s=80)
+            if len(x) > 1:
+                A = np.vstack([x, np.ones(len(x))]).T
+                pente, intercept = np.linalg.lstsq(A, y, rcond=None)[0]
+                ax.plot(x, pente * x + intercept, color='red', linewidth=2)
+                y_pred = pente * x + intercept
+                ss_res = np.sum((y - y_pred) ** 2)
+                ss_tot = np.sum((y - np.mean(y)) ** 2)
+                r2 = 1 - (ss_res / ss_tot)
+                ax.set_title(f"R² = {r2:.3f} | y = {pente:.6f}x + {intercept:.2f}")
+            st.pyplot(fig)
+        
+        with tab_reg2:
+            st.markdown("#### Budget + Âge → Satisfaction")
+            if len(df) >= 5:
+                X = df[['budget', 'age']].values
+                y = df['satisfaction'].values
+                modele = LinearRegression()
+                modele.fit(X, y)
+                y_pred = modele.predict(X)
+                
+                coef_df = pd.DataFrame({'Variable': ['Budget', 'Âge'], 'Coefficient': modele.coef_})
+                st.dataframe(coef_df)
+                st.metric("R²", f"{r2_score(y, y_pred):.3f}")
+            else:
+                st.info("Données insuffisantes.")
+    
+    elif st.session_state['section'] == 'pca':
+        st.markdown("### PCA - Profils Clients")
+        if len(df) >= 5:
+            features = ['budget', 'age', 'satisfaction', 'delai']
+            scaler = StandardScaler()
+            X_scaled = scaler.fit_transform(df[features].dropna())
+            pca = PCA(n_components=2)
+            pca_result = pca.fit_transform(X_scaled)
+            df_pca = pd.DataFrame({'PC1': pca_result[:, 0], 'PC2': pca_result[:, 1], 'Atelier': df['atelier'].values[:len(pca_result)]})
+            fig = px.scatter(df_pca, x='PC1', y='PC2', color='Atelier', title=f"PCA (PC1: {pca.explained_variance_ratio_[0]*100:.0f}%, PC2: {pca.explained_variance_ratio_[1]*100:.0f}%)")
+            st.plotly_chart(fig, use_container_width=True, key="pca_chart")
+        else:
+            st.info("Données insuffisantes.")
+    
+    elif st.session_state['section'] == 'classification':
+        st.markdown("### Classification - Recommandation")
+        if len(df) >= 10:
+            df['cible'] = (df['recommandation'] == 'Oui').astype(int)
+            X = df[['budget', 'age', 'satisfaction']].values
+            y = df['cible'].values
+            rf = RandomForestClassifier(n_estimators=50, random_state=42)
+            rf.fit(X, y)
+            importance = pd.DataFrame({'Variable': ['Budget', 'Âge', 'Satisfaction'], 'Importance': rf.feature_importances_})
+            fig = px.bar(importance, x='Importance', y='Variable', orientation='h')
+            st.plotly_chart(fig, use_container_width=True, key="importance_chart")
+            st.subheader("🔮 Prédire")
+            test_budget = st.number_input("Budget", value=150000)
+            test_age = st.slider("Âge", 15, 90, 30)
+            test_sat = st.slider("Satisfaction", 1, 5, 4)
+            if st.button("Prédire"):
+                pred = rf.predict([[test_budget, test_age, test_sat]])[0]
+                st.success("✅ Recommanderait") if pred == 1 else st.warning("❌ Ne recommanderait pas")
+        else:
+            st.info("Données insuffisantes.")
+    
+    elif st.session_state['section'] == 'clustering':
+        st.markdown("### Clustering - Segmentation Clients")
+        if len(df) >= 8:
+            features = ['budget', 'age', 'satisfaction']
+            scaler = StandardScaler()
+            X = scaler.fit_transform(df[features].dropna())
+            k = st.slider("Nombre de segments", 2, 4, 3)
+            kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
+            clusters = kmeans.fit_predict(X)
+            df['Segment'] = clusters[:len(df)]
+            fig = px.scatter(df, x='budget', y='satisfaction', color=clusters.astype(str), title=f"Segmentation en {k} groupes")
+            st.plotly_chart(fig, use_container_width=True, key="clustering_chart")
+            st.subheader("Profil des segments")
+            st.dataframe(df.groupby('Segment')[['budget', 'age', 'satisfaction']].mean())
+        else:
+            st.info("Données insuffisantes.")
 
 # -------------------- CITATION --------------------
 st.markdown("---")
