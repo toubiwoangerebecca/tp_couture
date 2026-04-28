@@ -38,11 +38,12 @@ st.markdown("""
         background: linear-gradient(135deg, #800020, #CD5C5C) !important;
         color: white !important;
         font-weight: bold !important;
-        font-size: 1.1rem !important;
+        font-size: 1.0rem !important;
         border: none !important;
         border-radius: 10px !important;
-        padding: 12px 24px !important;
+        padding: 10px 20px !important;
         transition: all 0.3s ease !important;
+        white-space: nowrap !important;
     }
     .stButton > button:hover {
         transform: scale(1.02) !important;
@@ -226,13 +227,13 @@ with col2:
     col_menu1, col_menu2, col_menu3 = st.columns(3)
     
     with col_menu1:
-        if st.button("Corrélation & Tendances", use_container_width=True):
+        if st.button("Corrélation & Tendances", use_container_width=True, key="btn_corr"):
             st.session_state['section'] = 'correlation'
     with col_menu2:
-        if st.button("Performance Ateliers", use_container_width=True):
+        if st.button("Performance Ateliers", use_container_width=True, key="btn_perf"):
             st.session_state['section'] = 'performance'
     with col_menu3:
-        if st.button("Données Brutes", use_container_width=True):
+        if st.button("Données Brutes", use_container_width=True, key="btn_data"):
             st.session_state['section'] = 'donnees'
     
     if 'section' not in st.session_state:
