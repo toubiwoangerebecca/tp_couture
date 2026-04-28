@@ -222,18 +222,25 @@ with col1:
                 st.success(f"Commande de {prenom} enregistrée avec succès ({nb_tenues} tenue(s)) !")
     
     # --- BOUTON D'ANNULATION ---
-    if os.path.exists(DATA_FILE):
-        df_data = pd.read_csv(DATA_FILE)
-        if not df_data.empty:
-            st.markdown("---")
-            st.markdown("### ⚠️ Zone de correction")
-            derniere = df_data.iloc[-1]
-            st.warning(f"**Dernière commande :** {derniere['prenom']} - {derniere['type_tenue']} ({derniere['atelier']})")
-            if st.button("🗑️ Annuler cette commande", use_container_width=True):
-                df_data = df_data.iloc[:-1]
-                df_data.to_csv(DATA_FILE, index=False)
-                st.success("Commande supprimée avec succès.")
-                st.rerun()
+if os.path.exists(DATA_FILE):
+    df_data = pd.read_csv(DATA_FILE)
+    if not df_data.empty:
+        st.markdown("---")
+        st.markdown("### ⚠️ Zone de correction")
+        derniere = df_data.iloc[-1]
+        st.markdown(f"""
+            <div style="background-color: #FFF3CD; border: 1px solid #FFC107; border-radius: 10px; padding: 15px; color: #856404;">
+                <b>⚠️ Dernière commande enregistrée :</b><br>
+                <b>Client :</b> {derniere['prenom']}<br>
+                <b>Tenue :</b> {derniere['type_tenue']}<br>
+                <b>Atelier :</b> {derniere['atelier']}
+            </div>
+        """, unsafe_allow_html=True)
+        if st.button("🗑️ Annuler cette commande", use_container_width=True):
+            df_data = df_data.iloc[:-1]
+            df_data.to_csv(DATA_FILE, index=False)
+            st.success("Commande supprimée avec succès.")
+            st.rerun()
 
 # ==============================================
 # PARTIE DROITE : ANALYSE
