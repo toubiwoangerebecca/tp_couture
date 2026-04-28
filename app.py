@@ -164,6 +164,20 @@ with col1:
                 }])
                 sauvegarder_commande(nouvelle)
                 st.success(f"Commande de {prenom} enregistrée avec succès !")
+    
+    # --- BOUTON D'ANNULATION ---
+    if os.path.exists(DATA_FILE):
+        df_data = pd.read_csv(DATA_FILE)
+        if not df_data.empty:
+            with st.expander("Annuler la dernière commande", expanded=False):
+                st.warning("Supprime la dernière commande en cas d'erreur.")
+                derniere = df_data.iloc[-1]
+                st.markdown(f"**Dernière commande :** {derniere['prenom']} - {derniere['type_tenue']} ({derniere['atelier']})")
+                if st.button("Supprimer cette commande"):
+                    df_data = df_data.iloc[:-1]
+                    df_data.to_csv(DATA_FILE, index=False)
+                    st.success("Dernière commande supprimée.")
+                    st.rerun()
 
 # ==============================================
 # PARTIE DROITE : ANALYSE
@@ -208,32 +222,45 @@ with col2:
     
     st.markdown("---")
     
-    # ----- ONGLETS -----
-    tab1, tab2, tab3 = st.tabs(["Corrélation & Tendances", "Performance Ateliers", "Données Brutes"])
+    # ----- MENU ALIGNÉ -----
+    col_menu1, col_menu2, col_menu3 = st.columns(3)
     
-    with tab1:
+    with col_menu1:
+        if st.button("Corrélation & Tendances", use_container_width=True):
+            st.session_state['section'] = 'correlation'
+    with col_menu2:
+        if st.button("Performance Ateliers", use_container_width=True):
+            st.session_state['section'] = 'performance'
+    with col_menu3:
+        if st.button("Données Brutes", use_container_width=True):
+            st.session_state['section'] = 'donnees'
+    
+    if 'section' not in st.session_state:
+        st.session_state['section'] = 'correlation'
+    
+    st.markdown("---")
+    
+    # ----- AFFICHAGE SELON LA SECTION -----
+    if st.session_state['section'] == 'correlation':
+        st.markdown("### Corrélation & Tendances")
         colA, colB = st.columns(2)
-        
         with colA:
-            st.markdown("### Top 5 des Tissus")
+            st.markdown("#### Top 5 des Tissus")
             top_tissus = df['tissu'].value_counts().head(5)
             if len(top_tissus) > 0:
                 fig1, ax1 = plt.subplots(figsize=(5, 5))
                 couleurs = ['#800020', '#CD5C5C', '#D4A574', '#8B6F47', '#6B8E23']
                 ax1.pie(top_tissus.values, labels=top_tissus.index, autopct='%1.1f%%', colors=couleurs)
                 st.pyplot(fig1)
-        
         with colB:
-            st.markdown("### Top 5 des Tenues")
+            st.markdown("#### Top 5 des Tenues")
             top_tenues = df['type_tenue'].value_counts().head(5)
             if len(top_tenues) > 0:
                 fig2, ax2 = plt.subplots(figsize=(5, 5))
                 couleurs = ['#800020', '#CD5C5C', '#D4A574', '#8B6F47', '#6B8E23']
                 ax2.pie(top_tenues.values, labels=top_tenues.index, autopct='%1.1f%%', colors=couleurs)
                 st.pyplot(fig2)
-        
-        st.markdown("---")
-        st.markdown("### Corrélation : Budget vs Satisfaction")
+        st.markdown("#### Corrélation : Budget vs Satisfaction")
         fig3, ax3 = plt.subplots(figsize=(8, 4))
         x = df['budget'].values
         y = df['satisfaction'].values
@@ -251,11 +278,11 @@ with col2:
             ax3.set_title(f"Régression Linéaire | R² = {r2:.3f}")
         st.pyplot(fig3)
     
-    with tab2:
+    elif st.session_state['section'] == 'performance':
+        st.markdown("### Performance Ateliers")
         colC, colD = st.columns(2)
-        
         with colC:
-            st.markdown("### Satisfaction par Atelier")
+            st.markdown("#### Satisfaction par Atelier")
             satisf_atelier = df.groupby('atelier')['satisfaction'].mean().sort_values(ascending=False)
             fig4, ax4 = plt.subplots(figsize=(6, 4))
             couleurs = ['#800020', '#CD5C5C', '#D4A574', '#8B6F47', '#6B8E23']
@@ -266,9 +293,8 @@ with col2:
             for bar, val in zip(bars, satisf_atelier.values):
                 ax4.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.05, f'{val:.1f}', ha='center', fontweight='bold')
             st.pyplot(fig4)
-        
         with colD:
-            st.markdown("### Commandes par Atelier")
+            st.markdown("#### Commandes par Atelier")
             cmd_atelier = df['atelier'].value_counts()
             fig5, ax5 = plt.subplots(figsize=(6, 4))
             bars = ax5.bar(cmd_atelier.index, cmd_atelier.values, color=couleurs[:len(cmd_atelier)])
@@ -278,8 +304,8 @@ with col2:
                 ax5.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.1, str(val), ha='center', fontweight='bold')
             st.pyplot(fig5)
     
-    with tab3:
-        st.subheader("Base de Données")
+    elif st.session_state['section'] == 'donnees':
+        st.markdown("### Données Brutes")
         st.dataframe(df.sort_values('date', ascending=False), use_container_width=True)
         csv = df.to_csv(index=False).encode('utf-8')
         st.download_button("Télécharger (CSV)", data=csv, file_name='becca_export.csv', mime='text/csv')
