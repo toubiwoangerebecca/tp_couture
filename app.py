@@ -144,18 +144,18 @@ with col1:
     
     with st.form("formulaire_commande", clear_on_submit=True):
         atelier = st.selectbox("Atelier", ATELIERS)
-        prenom = st.text_input("Prénom du Client")
+        prenom = st.text_input("Nom du client", placeholder="Ex: Marie")
         age = st.number_input("Âge", min_value=15, max_value=90, value=30, step=1)
-        type_tenue = st.selectbox("Type de Tenue", TYPES_TENUES)
-        tissu = st.selectbox("Tissu Principal", TISSUS)
-        budget = st.number_input("Budget Total (FCFA)", min_value=10000, max_value=2000000, value=150000, step=10000)
-        delai = st.number_input("Délai de Confection (jours)", min_value=1, max_value=90, value=14, step=1)
-        satisfaction = st.slider("Score de Satisfaction", 1, 5, 4)
+        type_tenue = st.selectbox("Type de tenue", TYPES_TENUES)
+        tissu = st.selectbox("Tissu principal", TISSUS)
+        budget = st.number_input("Budget total (FCFA)", min_value=10000, max_value=2000000, value=150000, step=10000)
+        delai = st.number_input("Délai de confection (jours)", min_value=1, max_value=90, value=14, step=1)
+        satisfaction = st.slider("Satisfaction client (1 à 5)", 1, 5, 4)
         recommandation = st.radio("Recommanderait l'atelier ?", ["Oui", "Non"], horizontal=True)
         
         if st.form_submit_button("Enregistrer la Commande"):
             if prenom == "":
-                st.error("Le prénom du client est requis.")
+                st.error("Le nom du client est requis.")
             else:
                 nouvelle = pd.DataFrame([{
                     "date": datetime.now().strftime("%Y-%m-%d %H:%M"), "atelier": atelier, "prenom": prenom,
