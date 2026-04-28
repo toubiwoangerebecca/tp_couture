@@ -82,6 +82,8 @@ with st.sidebar:
     st.markdown("• Bafoussam - Centre")
     st.markdown("• Limbé - Bord de mer")
     st.markdown("• Garoua - Centre ville")
+    st.markdown("---")
+    mode_demo = st.checkbox("Activer les données de démonstration", value=True)
 
 # -------------------- TITRE --------------------
 st.title("BECCA STYLE & DESIGN")
@@ -188,25 +190,32 @@ with col2:
     
     df = charger_donnees()
     
-    if df.empty:
-        st.info("Aucune commande enregistrée. Affichage des données de démonstration.")
+    if mode_demo:
+        st.success("Mode démonstration activé – 20 commandes exemples.")
         df = pd.DataFrame([
-            {"date":"2026-04-21 10:00","atelier":"Douala - Bonapriso","prenom":"Marie","age":28,"type_tenue":"Robe de mariée","tissu":"Dentelle de Calais","budget":450000,"delai":30,"satisfaction":5,"recommandation":"Oui"},
-            {"date":"2026-04-21 10:30","atelier":"Douala - Bonapriso","prenom":"Jeanne","age":35,"type_tenue":"Tailleur femme","tissu":"Lin","budget":85000,"delai":10,"satisfaction":4,"recommandation":"Oui"},
-            {"date":"2026-04-21 11:00","atelier":"Douala - Bonapriso","prenom":"Carine","age":22,"type_tenue":"Robe de cocktail","tissu":"Satin","budget":120000,"delai":14,"satisfaction":5,"recommandation":"Oui"},
-            {"date":"2026-04-21 11:30","atelier":"Yaoundé - Bastos","prenom":"Paul","age":40,"type_tenue":"Costume homme","tissu":"Coton égyptien","budget":150000,"delai":21,"satisfaction":4,"recommandation":"Oui"},
-            {"date":"2026-04-21 12:00","atelier":"Yaoundé - Bastos","prenom":"Chantal","age":31,"type_tenue":"Kaba Ngondo","tissu":"Wax haut de gamme","budget":95000,"delai":7,"satisfaction":3,"recommandation":"Non"},
-            {"date":"2026-04-21 12:30","atelier":"Yaoundé - Bastos","prenom":"Sylvie","age":45,"type_tenue":"Boubou africain","tissu":"Bazin riche","budget":200000,"delai":14,"satisfaction":5,"recommandation":"Oui"},
-            {"date":"2026-04-21 13:00","atelier":"Yaoundé - Bastos","prenom":"Thomas","age":33,"type_tenue":"Costume de marié","tissu":"Soie sauvage","budget":350000,"delai":28,"satisfaction":4,"recommandation":"Oui"},
-            {"date":"2026-04-21 13:30","atelier":"Bafoussam - Centre","prenom":"Pauline","age":50,"type_tenue":"Sanja","tissu":"Tissu traditionnel (Ndop, Obom)","budget":110000,"delai":10,"satisfaction":5,"recommandation":"Oui"},
-            {"date":"2026-04-21 14:00","atelier":"Bafoussam - Centre","prenom":"Alice","age":27,"type_tenue":"Robe de soirée longue","tissu":"Velours","budget":175000,"delai":21,"satisfaction":4,"recommandation":"Oui"},
-            {"date":"2026-04-21 14:30","atelier":"Bafoussam - Centre","prenom":"Roger","age":55,"type_tenue":"Costume homme","tissu":"Lin","budget":130000,"delai":14,"satisfaction":3,"recommandation":"Oui"},
-            {"date":"2026-04-21 15:00","atelier":"Limbé - Bord de mer","prenom":"Estelle","age":29,"type_tenue":"Robe d'été","tissu":"Coton égyptien","budget":65000,"delai":7,"satisfaction":5,"recommandation":"Oui"},
-            {"date":"2026-04-21 15:30","atelier":"Limbé - Bord de mer","prenom":"Flora","age":38,"type_tenue":"Ensemble pagne wax","tissu":"Wax haut de gamme","budget":90000,"delai":10,"satisfaction":4,"recommandation":"Oui"},
-            {"date":"2026-04-21 16:00","atelier":"Garoua - Centre ville","prenom":"Aïcha","age":26,"type_tenue":"Boubou africain","tissu":"Bazin riche","budget":220000,"delai":14,"satisfaction":5,"recommandation":"Oui"},
-            {"date":"2026-04-21 16:30","atelier":"Garoua - Centre ville","prenom":"Mariam","age":34,"type_tenue":"Tenue de mariage traditionnel","tissu":"Tissu traditionnel (Ndop, Obom)","budget":300000,"delai":30,"satisfaction":4,"recommandation":"Oui"},
-            {"date":"2026-04-21 17:00","atelier":"Garoua - Centre ville","prenom":"Fati","age":42,"type_tenue":"Accessoire de luxe","tissu":"Soie sauvage","budget":45000,"delai":5,"satisfaction":5,"recommandation":"Oui"},
+            {"date":"2026-04-01 10:00","atelier":"Douala - Bonapriso","prenom":"Marie","age":28,"type_tenue":"Robe de mariée","tissu":"Dentelle de Calais","budget":450000,"delai":30,"satisfaction":5,"recommandation":"Oui"},
+            {"date":"2026-04-02 11:00","atelier":"Douala - Bonapriso","prenom":"Jeanne","age":35,"type_tenue":"Tailleur femme","tissu":"Lin","budget":85000,"delai":10,"satisfaction":4,"recommandation":"Oui"},
+            {"date":"2026-04-03 12:00","atelier":"Douala - Bonapriso","prenom":"Carine","age":22,"type_tenue":"Robe de cocktail","tissu":"Satin","budget":120000,"delai":14,"satisfaction":5,"recommandation":"Oui"},
+            {"date":"2026-04-04 13:00","atelier":"Douala - Bonapriso","prenom":"Sandrine","age":31,"type_tenue":"Robe de soirée longue","tissu":"Soie sauvage","budget":195000,"delai":21,"satisfaction":5,"recommandation":"Oui"},
+            {"date":"2026-04-05 10:30","atelier":"Yaoundé - Bastos","prenom":"Paul","age":40,"type_tenue":"Costume homme","tissu":"Coton égyptien","budget":150000,"delai":21,"satisfaction":4,"recommandation":"Oui"},
+            {"date":"2026-04-06 11:30","atelier":"Yaoundé - Bastos","prenom":"Chantal","age":31,"type_tenue":"Kaba Ngondo","tissu":"Wax haut de gamme","budget":95000,"delai":7,"satisfaction":3,"recommandation":"Non"},
+            {"date":"2026-04-07 12:30","atelier":"Yaoundé - Bastos","prenom":"Sylvie","age":45,"type_tenue":"Boubou africain","tissu":"Bazin riche","budget":200000,"delai":14,"satisfaction":5,"recommandation":"Oui"},
+            {"date":"2026-04-08 13:30","atelier":"Yaoundé - Bastos","prenom":"Thomas","age":33,"type_tenue":"Costume de marié","tissu":"Soie sauvage","budget":350000,"delai":28,"satisfaction":4,"recommandation":"Oui"},
+            {"date":"2026-04-09 10:00","atelier":"Bafoussam - Centre","prenom":"Pauline","age":50,"type_tenue":"Sanja","tissu":"Tissu traditionnel (Ndop, Obom)","budget":110000,"delai":10,"satisfaction":5,"recommandation":"Oui"},
+            {"date":"2026-04-10 11:00","atelier":"Bafoussam - Centre","prenom":"Alice","age":27,"type_tenue":"Robe de soirée longue","tissu":"Velours","budget":175000,"delai":21,"satisfaction":4,"recommandation":"Oui"},
+            {"date":"2026-04-11 12:00","atelier":"Bafoussam - Centre","prenom":"Roger","age":55,"type_tenue":"Costume homme","tissu":"Lin","budget":130000,"delai":14,"satisfaction":3,"recommandation":"Oui"},
+            {"date":"2026-04-12 13:00","atelier":"Bafoussam - Centre","prenom":"Brigitte","age":47,"type_tenue":"Ensemble jupe + bustier","tissu":"Wax haut de gamme","budget":135000,"delai":10,"satisfaction":4,"recommandation":"Oui"},
+            {"date":"2026-04-13 10:30","atelier":"Limbé - Bord de mer","prenom":"Estelle","age":29,"type_tenue":"Robe d'été","tissu":"Coton égyptien","budget":65000,"delai":7,"satisfaction":5,"recommandation":"Oui"},
+            {"date":"2026-04-14 11:30","atelier":"Limbé - Bord de mer","prenom":"Flora","age":38,"type_tenue":"Ensemble pagne wax","tissu":"Wax haut de gamme","budget":90000,"delai":10,"satisfaction":4,"recommandation":"Oui"},
+            {"date":"2026-04-15 12:30","atelier":"Limbé - Bord de mer","prenom":"Marc","age":42,"type_tenue":"Chemise sur mesure","tissu":"Lin","budget":45000,"delai":5,"satisfaction":5,"recommandation":"Oui"},
+            {"date":"2026-04-16 13:30","atelier":"Limbé - Bord de mer","prenom":"Nadine","age":25,"type_tenue":"Robe de cocktail","tissu":"Mousseline","budget":105000,"delai":12,"satisfaction":5,"recommandation":"Oui"},
+            {"date":"2026-04-17 10:00","atelier":"Garoua - Centre ville","prenom":"Aïcha","age":26,"type_tenue":"Boubou africain","tissu":"Bazin riche","budget":220000,"delai":14,"satisfaction":5,"recommandation":"Oui"},
+            {"date":"2026-04-18 11:00","atelier":"Garoua - Centre ville","prenom":"Mariam","age":34,"type_tenue":"Tenue de mariage traditionnel","tissu":"Tissu traditionnel (Ndop, Obom)","budget":300000,"delai":30,"satisfaction":4,"recommandation":"Oui"},
+            {"date":"2026-04-19 12:00","atelier":"Garoua - Centre ville","prenom":"Fati","age":42,"type_tenue":"Accessoire de luxe","tissu":"Soie sauvage","budget":45000,"delai":5,"satisfaction":5,"recommandation":"Oui"},
+            {"date":"2026-04-20 13:00","atelier":"Garoua - Centre ville","prenom":"Ousmane","age":38,"type_tenue":"Boubou africain","tissu":"Bazin riche","budget":250000,"delai":21,"satisfaction":5,"recommandation":"Oui"},
         ])
+    elif df.empty:
+        st.info("Aucune commande enregistrée. Remplissez le formulaire ou activez le mode démo.")
     
     # ----- INDICATEURS -----
     st.markdown("#### Indicateurs de Performance")
