@@ -83,7 +83,12 @@ with st.sidebar:
     st.markdown("• Limbé - Bord de mer")
     st.markdown("• Garoua - Centre ville")
     st.markdown("---")
-    mode_demo = st.checkbox("Activer les données de démonstration", value=True)
+    st.markdown("### ⚙️ Paramètres d'affichage")
+    mode_demo = st.checkbox("Afficher les données de démonstration", value=True)
+    if mode_demo:
+        st.success("Mode démo activé – 20 exemples")
+    else:
+        st.info("Données réelles affichées")
 
 # -------------------- TITRE --------------------
 st.title("BECCA STYLE & DESIGN")
@@ -149,10 +154,34 @@ with col1:
         atelier = st.selectbox("Atelier", ATELIERS)
         prenom = st.text_input("Nom du client", placeholder="Ex: Marie")
         age = st.number_input("Âge", min_value=15, max_value=90, value=30, step=1)
-        type_tenue = st.selectbox("Type de tenue", TYPES_TENUES)
-        tissu = st.selectbox("Tissu principal", TISSUS)
-        budget = st.number_input("Budget total (FCFA)", min_value=10000, max_value=2000000, value=150000, step=10000)
-        delai = st.number_input("Délai de confection (jours)", min_value=1, max_value=90, value=14, step=1)
+        
+        st.markdown("---")
+        st.markdown("### Tenues commandées")
+        
+        nb_tenues = st.selectbox("Nombre de tenues commandées", [1, 2, 3], index=0)
+        
+        st.markdown("**Tenue 1**")
+        type_tenue1 = st.selectbox("Type de tenue", TYPES_TENUES, key="t1")
+        tissu1 = st.selectbox("Tissu principal", TISSUS, key="tis1")
+        budget1 = st.number_input("Budget (FCFA)", min_value=10000, max_value=2000000, value=150000, step=10000, key="b1")
+        delai1 = st.number_input("Délai (jours)", min_value=1, max_value=90, value=14, step=1, key="d1")
+        
+        if nb_tenues >= 2:
+            st.markdown("**Tenue 2**")
+            type_tenue2 = st.selectbox("Type de tenue", TYPES_TENUES, key="t2")
+            tissu2 = st.selectbox("Tissu principal", TISSUS, key="tis2")
+            budget2 = st.number_input("Budget (FCFA)", min_value=10000, max_value=2000000, value=150000, step=10000, key="b2")
+            delai2 = st.number_input("Délai (jours)", min_value=1, max_value=90, value=14, step=1, key="d2")
+        
+        if nb_tenues >= 3:
+            st.markdown("**Tenue 3**")
+            type_tenue3 = st.selectbox("Type de tenue", TYPES_TENUES, key="t3")
+            tissu3 = st.selectbox("Tissu principal", TISSUS, key="tis3")
+            budget3 = st.number_input("Budget (FCFA)", min_value=10000, max_value=2000000, value=150000, step=10000, key="b3")
+            delai3 = st.number_input("Délai (jours)", min_value=1, max_value=90, value=14, step=1, key="d3")
+        
+        st.markdown("---")
+        
         satisfaction = st.slider("Satisfaction client (1 à 5)", 1, 5, 4)
         recommandation = st.radio("Recommanderait l'atelier ?", ["Oui", "Non"], horizontal=True)
         
@@ -162,25 +191,42 @@ with col1:
             else:
                 nouvelle = pd.DataFrame([{
                     "date": datetime.now().strftime("%Y-%m-%d %H:%M"), "atelier": atelier, "prenom": prenom,
-                    "age": age, "type_tenue": type_tenue, "tissu": tissu, "budget": budget,
-                    "delai": delai, "satisfaction": satisfaction, "recommandation": recommandation
+                    "age": age, "type_tenue": type_tenue1, "tissu": tissu1, "budget": budget1,
+                    "delai": delai1, "satisfaction": satisfaction, "recommandation": recommandation
                 }])
+                
+                if nb_tenues >= 2:
+                    nouvelle2 = pd.DataFrame([{
+                        "date": datetime.now().strftime("%Y-%m-%d %H:%M"), "atelier": atelier, "prenom": prenom,
+                        "age": age, "type_tenue": type_tenue2, "tissu": tissu2, "budget": budget2,
+                        "delai": delai2, "satisfaction": satisfaction, "recommandation": recommandation
+                    }])
+                    nouvelle = pd.concat([nouvelle, nouvelle2], ignore_index=True)
+                
+                if nb_tenues >= 3:
+                    nouvelle3 = pd.DataFrame([{
+                        "date": datetime.now().strftime("%Y-%m-%d %H:%M"), "atelier": atelier, "prenom": prenom,
+                        "age": age, "type_tenue": type_tenue3, "tissu": tissu3, "budget": budget3,
+                        "delai": delai3, "satisfaction": satisfaction, "recommandation": recommandation
+                    }])
+                    nouvelle = pd.concat([nouvelle, nouvelle3], ignore_index=True)
+                
                 sauvegarder_commande(nouvelle)
-                st.success(f"Commande de {prenom} enregistrée avec succès !")
+                st.success(f"Commande de {prenom} enregistrée avec succès ({nb_tenues} tenue(s)) !")
     
     # --- BOUTON D'ANNULATION ---
     if os.path.exists(DATA_FILE):
         df_data = pd.read_csv(DATA_FILE)
         if not df_data.empty:
-            with st.expander("Annuler la dernière commande", expanded=False):
-                st.warning("Supprime la dernière commande en cas d'erreur.")
-                derniere = df_data.iloc[-1]
-                st.markdown(f"**Dernière commande :** {derniere['prenom']} - {derniere['type_tenue']} ({derniere['atelier']})")
-                if st.button("Supprimer cette commande"):
-                    df_data = df_data.iloc[:-1]
-                    df_data.to_csv(DATA_FILE, index=False)
-                    st.success("Dernière commande supprimée.")
-                    st.rerun()
+            st.markdown("---")
+            st.markdown("### ⚠️ Zone de correction")
+            derniere = df_data.iloc[-1]
+            st.warning(f"**Dernière commande :** {derniere['prenom']} - {derniere['type_tenue']} ({derniere['atelier']})")
+            if st.button("🗑️ Annuler cette commande", use_container_width=True):
+                df_data = df_data.iloc[:-1]
+                df_data.to_csv(DATA_FILE, index=False)
+                st.success("Commande supprimée avec succès.")
+                st.rerun()
 
 # ==============================================
 # PARTIE DROITE : ANALYSE
