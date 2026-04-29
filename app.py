@@ -26,9 +26,10 @@ st.set_page_config(
     layout="wide"
 )
 
-# -------------------- CSS PROFESSIONNEL --------------------
+# -------------------- CSS ADAPTATIF (CLAIR + SOMBRE) --------------------
 st.markdown("""
     <style>
+    /* ========== MODE CLAIR (par défaut) ========== */
     .stApp {
         background: linear-gradient(180deg, #FFF5F5 0%, #FFFFFF 100%);
     }
@@ -39,9 +40,8 @@ st.markdown("""
         font-size: 3.2rem !important;
         text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
     }
-    h3, .stSubheader {
-        color: #4A3728 !important;
-        font-family: 'Georgia', serif !important;
+    h3, .stSubheader, p, label, span, div {
+        color: #333333 !important;
     }
     .stButton > button {
         background: linear-gradient(135deg, #800020, #CD5C5C) !important;
@@ -81,12 +81,66 @@ st.markdown("""
         box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important;
         border: 1px solid #F0E0E0 !important;
     }
+    .stTextInput > div > div > input, .stSelectbox > div > div, .stNumberInput > div > div > input {
+        color: #333333 !important;
+        background: white !important;
+    }
     .comment-box {
-        background: white;
+        background: #FFFFFF !important;
         padding: 15px;
         border-radius: 10px;
         margin: 10px 0;
         border-left: 4px solid #800020;
+        color: #333333 !important;
+    }
+    .stTabs [data-baseweb="tab"] {
+        color: #333333 !important;
+    }
+    .stInfo, .stSuccess, .stWarning {
+        color: #333333 !important;
+    }
+
+    /* ========== MODE SOMBRE ========== */
+    @media (prefers-color-scheme: dark) {
+        .stApp {
+            background: #1a1a2e !important;
+        }
+        h1 {
+            color: #CD5C5C !important;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        h3, .stSubheader, p, label, span, div {
+            color: #e0e0e0 !important;
+        }
+        .comment-box {
+            background: #2d2d44 !important;
+            color: #e0e0e0 !important;
+            border-left: 4px solid #CD5C5C !important;
+        }
+        [data-testid="stMetric"] {
+            background: #2d2d44 !important;
+            border: 1px solid #CD5C5C !important;
+        }
+        [data-testid="stMetricLabel"] {
+            color: #CD5C5C !important;
+        }
+        [data-testid="stMetricValue"] {
+            color: #FFB6C1 !important;
+        }
+        .stForm {
+            background: #2d2d44 !important;
+            border: 1px solid #555 !important;
+        }
+        .stTextInput > div > div > input, .stSelectbox > div > div, .stNumberInput > div > div > input {
+            color: #e0e0e0 !important;
+            background: #1a1a2e !important;
+        }
+        .stMarkdown, .stInfo, .stSuccess, .stWarning {
+            color: #e0e0e0 !important;
+        }
+        .stTabs [data-baseweb="tab"] {
+            color: #e0e0e0 !important;
+        }
     }
     </style>
 """, unsafe_allow_html=True)
