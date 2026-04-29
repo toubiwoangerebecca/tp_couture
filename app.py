@@ -26,10 +26,9 @@ st.set_page_config(
     layout="wide"
 )
 
-# -------------------- CSS ADAPTATIF (CLAIR + SOMBRE) --------------------
+# -------------------- CSS SIMPLE ET PROPRE --------------------
 st.markdown("""
     <style>
-    /* ========== MODE CLAIR (par défaut) ========== */
     .stApp {
         background: linear-gradient(180deg, #FFF5F5 0%, #FFFFFF 100%);
     }
@@ -40,8 +39,9 @@ st.markdown("""
         font-size: 3.2rem !important;
         text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
     }
-    h3, .stSubheader, p, label, span, div {
-        color: #333333 !important;
+    h3, .stSubheader {
+        color: #4A3728 !important;
+        font-family: 'Georgia', serif !important;
     }
     .stButton > button {
         background: linear-gradient(135deg, #800020, #CD5C5C) !important;
@@ -81,66 +81,16 @@ st.markdown("""
         box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important;
         border: 1px solid #F0E0E0 !important;
     }
-    .stTextInput > div > div > input, .stSelectbox > div > div, .stNumberInput > div > div > input {
-        color: #333333 !important;
-        background: white !important;
-    }
     .comment-box {
-        background: #FFFFFF !important;
+        background: #FFF5F5 !important;
         padding: 15px;
         border-radius: 10px;
         margin: 10px 0;
         border-left: 4px solid #800020;
-        color: #333333 !important;
+        color: #4A3728 !important;
     }
-    .stTabs [data-baseweb="tab"] {
+    p, span, div, label {
         color: #333333 !important;
-    }
-    .stInfo, .stSuccess, .stWarning {
-        color: #333333 !important;
-    }
-
-    /* ========== MODE SOMBRE ========== */
-    @media (prefers-color-scheme: dark) {
-        .stApp {
-            background: #1a1a2e !important;
-        }
-        h1 {
-            color: #CD5C5C !important;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        }
-        h3, .stSubheader, p, label, span, div {
-            color: #e0e0e0 !important;
-        }
-        .comment-box {
-            background: #2d2d44 !important;
-            color: #e0e0e0 !important;
-            border-left: 4px solid #CD5C5C !important;
-        }
-        [data-testid="stMetric"] {
-            background: #2d2d44 !important;
-            border: 1px solid #CD5C5C !important;
-        }
-        [data-testid="stMetricLabel"] {
-            color: #CD5C5C !important;
-        }
-        [data-testid="stMetricValue"] {
-            color: #FFB6C1 !important;
-        }
-        .stForm {
-            background: #2d2d44 !important;
-            border: 1px solid #555 !important;
-        }
-        .stTextInput > div > div > input, .stSelectbox > div > div, .stNumberInput > div > div > input {
-            color: #e0e0e0 !important;
-            background: #1a1a2e !important;
-        }
-        .stMarkdown, .stInfo, .stSuccess, .stWarning {
-            color: #e0e0e0 !important;
-        }
-        .stTabs [data-baseweb="tab"] {
-            color: #e0e0e0 !important;
-        }
     }
     </style>
 """, unsafe_allow_html=True)
@@ -360,12 +310,21 @@ with col2:
     with m1:
         st.metric("Total Commandes", len(df))
     with m2:
-        st.metric("Budget Moyen", f"{df['budget'].mean():,.0f} FCFA".replace(",", " "))
+        if 'budget' in df.columns and len(df) > 0:
+            st.metric("Budget Moyen", f"{df['budget'].mean():,.0f} FCFA".replace(",", " "))
+        else:
+            st.metric("Budget Moyen", "0 FCFA")
     with m3:
-        st.metric("Satisfaction Moyenne", f"{df['satisfaction'].mean():.1f}/5")
+        if 'satisfaction' in df.columns and len(df) > 0:
+            st.metric("Satisfaction Moyenne", f"{df['satisfaction'].mean():.1f}/5")
+        else:
+            st.metric("Satisfaction Moyenne", "N/A")
     with m4:
-        taux = (df['recommandation'] == "Oui").mean() * 100
-        st.metric("Recommandation", f"{taux:.0f}%")
+        if 'recommandation' in df.columns and len(df) > 0:
+            taux = (df['recommandation'] == "Oui").mean() * 100
+            st.metric("Recommandation", f"{taux:.0f}%")
+        else:
+            st.metric("Recommandation", "N/A")
 
     st.markdown("""
         <div class="comment-box">
