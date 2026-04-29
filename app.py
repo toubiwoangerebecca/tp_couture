@@ -59,11 +59,20 @@ st.markdown("""
         box-shadow: 0 6px 20px rgba(128,0,32,0.4) !important;
     }
     [data-testid="stMetric"] {
-        background: white !important;
+        background: #FFF5F5 !important;
         border-radius: 15px !important;
-        padding: 15px !important;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.08) !important;
-        border-left: 4px solid #800020 !important;
+        padding: 20px !important;
+        box-shadow: 0 6px 20px rgba(128,0,32,0.2) !important;
+        border: 1px solid #CD5C5C !important;
+        border-left: 6px solid #800020 !important;
+    }
+    [data-testid="stMetricLabel"] {
+        color: #800020 !important;
+        font-weight: bold !important;
+    }
+    [data-testid="stMetricValue"] {
+        color: #4A0000 !important;
+        font-size: 2rem !important;
     }
     .stForm {
         background: white !important;
@@ -166,43 +175,43 @@ col1, col2 = st.columns([1, 2])
 with col1:
     st.subheader("📝 Nouvelle Commande")
     st.markdown("*Remplissez ce formulaire pour chaque cliente. Une cliente peut commander jusqu'à 3 tenues à la fois.*")
-    
+
     with st.form("formulaire_commande", clear_on_submit=True):
         atelier = st.selectbox("Atelier de prise en charge", ATELIERS)
         prenom = st.text_input("Nom de la cliente", placeholder="Ex: Marie")
         age = st.number_input("Âge de la cliente", min_value=15, max_value=90, value=30, step=1)
-        
+
         st.markdown("---")
         st.markdown("### Tenues commandées")
         st.markdown("*Sélectionnez le nombre de tenues que la cliente souhaite commander.*")
-        
+
         nb_tenues = st.selectbox("Nombre de tenues", [1, 2, 3], index=0)
-        
+
         st.markdown("**Tenue 1** *(obligatoire)*")
         type_tenue1 = st.selectbox("Type de tenue", TYPES_TENUES, key="t1")
         tissu1 = st.selectbox("Tissu principal", TISSUS, key="tis1")
         budget1 = st.number_input("Budget (FCFA)", min_value=10000, max_value=2000000, value=150000, step=10000, key="b1")
         delai1 = st.number_input("Délai de confection (jours)", min_value=1, max_value=90, value=14, step=1, key="d1")
-        
+
         if nb_tenues >= 2:
             st.markdown("**Tenue 2**")
             type_tenue2 = st.selectbox("Type de tenue", TYPES_TENUES, key="t2")
             tissu2 = st.selectbox("Tissu principal", TISSUS, key="tis2")
             budget2 = st.number_input("Budget (FCFA)", min_value=10000, max_value=2000000, value=150000, step=10000, key="b2")
             delai2 = st.number_input("Délai de confection (jours)", min_value=1, max_value=90, value=14, step=1, key="d2")
-        
+
         if nb_tenues >= 3:
             st.markdown("**Tenue 3**")
             type_tenue3 = st.selectbox("Type de tenue", TYPES_TENUES, key="t3")
             tissu3 = st.selectbox("Tissu principal", TISSUS, key="tis3")
             budget3 = st.number_input("Budget (FCFA)", min_value=10000, max_value=2000000, value=150000, step=10000, key="b3")
             delai3 = st.number_input("Délai de confection (jours)", min_value=1, max_value=90, value=14, step=1, key="d3")
-        
+
         st.markdown("---")
         st.markdown("### Retour de la cliente")
         satisfaction = st.slider("Niveau de satisfaction (1 = très insatisfaite, 5 = très satisfaite)", 1, 5, 4)
         recommandation = st.radio("La cliente recommanderait-elle la Maison Becca ?", ["Oui", "Non"], horizontal=True)
-        
+
         if st.form_submit_button("💾 Enregistrer la commande"):
             if prenom == "":
                 st.error("❌ Veuillez entrer le nom de la cliente.")
@@ -212,7 +221,7 @@ with col1:
                     "age": age, "type_tenue": type_tenue1, "tissu": tissu1, "budget": budget1,
                     "delai": delai1, "satisfaction": satisfaction, "recommandation": recommandation
                 }])
-                
+
                 if nb_tenues >= 2:
                     nouvelle2 = pd.DataFrame([{
                         "date": datetime.now().strftime("%Y-%m-%d %H:%M"), "atelier": atelier, "prenom": prenom,
@@ -220,7 +229,7 @@ with col1:
                         "delai": delai2, "satisfaction": satisfaction, "recommandation": recommandation
                     }])
                     nouvelle = pd.concat([nouvelle, nouvelle2], ignore_index=True)
-                
+
                 if nb_tenues >= 3:
                     nouvelle3 = pd.DataFrame([{
                         "date": datetime.now().strftime("%Y-%m-%d %H:%M"), "atelier": atelier, "prenom": prenom,
@@ -228,10 +237,10 @@ with col1:
                         "delai": delai3, "satisfaction": satisfaction, "recommandation": recommandation
                     }])
                     nouvelle = pd.concat([nouvelle, nouvelle3], ignore_index=True)
-                
+
                 sauvegarder_commande(nouvelle)
                 st.success(f"✅ Commande de {prenom} enregistrée ({nb_tenues} tenue(s)).")
-    
+
     # --- BOUTON D'ANNULATION ---
     if os.path.exists(DATA_FILE):
         df_data = pd.read_csv(DATA_FILE)
@@ -260,9 +269,9 @@ with col1:
 with col2:
     st.subheader("📊 Analyse des Données")
     st.markdown("*Tableau de bord d'aide à la décision pour la Direction de la Maison Becca.*")
-    
+
     df = charger_donnees()
-    
+
     if mode_demo:
         st.success("🟢 Mode démonstration activé – 20 commandes exemples affichées.")
         df = pd.DataFrame([
@@ -289,7 +298,7 @@ with col2:
         ])
     elif df.empty:
         st.info("Aucune commande enregistrée. Remplissez le formulaire ou activez le mode démo.")
-    
+
     # ----- INDICATEURS -----
     st.markdown("#### Indicateurs de Performance")
     st.markdown("*Ces quatre indicateurs clés résument l'activité globale des 5 ateliers.*")
@@ -303,7 +312,7 @@ with col2:
     with m4:
         taux = (df['recommandation'] == "Oui").mean() * 100
         st.metric("Recommandation", f"{taux:.0f}%")
-    
+
     st.markdown("""
         <div class="comment-box">
             <b>📊 Interprétation :</b> Ces indicateurs offrent une vue d'ensemble de la performance 
@@ -312,13 +321,13 @@ with col2:
             rapidement si un atelier rencontre des difficultés.
         </div>
     """, unsafe_allow_html=True)
-    
+
     st.markdown("---")
-    
+
     # ----- MENU ALIGNÉ (5 boutons) -----
     st.markdown("*Sélectionnez une section d'analyse parmi les 5 modules ci-dessous :*")
     col_menu1, col_menu2, col_menu3, col_menu4, col_menu5 = st.columns(5)
-    
+
     with col_menu1:
         if st.button("📊 Tendances", use_container_width=True, key="btn_tend"):
             st.session_state['section'] = 'tendances'
@@ -334,12 +343,12 @@ with col2:
     with col_menu5:
         if st.button("🔄 Clustering", use_container_width=True, key="btn_clust"):
             st.session_state['section'] = 'clustering'
-    
+
     if 'section' not in st.session_state:
         st.session_state['section'] = 'tendances'
-    
+
     st.markdown("---")
-    
+
     # ----- AFFICHAGE SELON LA SECTION -----
     if st.session_state['section'] == 'tendances':
         st.markdown("### 📊 Tendances & Camemberts")
@@ -393,12 +402,12 @@ with col2:
         st.dataframe(df.sort_values('date', ascending=False), use_container_width=True)
         csv = df.to_csv(index=False).encode('utf-8')
         st.download_button("📥 Télécharger (CSV)", data=csv, file_name='becca_export.csv', mime='text/csv')
-    
+
     elif st.session_state['section'] == 'regression':
         st.markdown("### 📈 Régression Linéaire")
         st.markdown("*La régression linéaire permet de mesurer l'impact d'une ou plusieurs variables sur une autre. C'est une technique fondamentale de l'analyse de données.*")
         tab_reg1, tab_reg2 = st.tabs(["Régression Simple", "Régression Multiple"])
-        
+
         with tab_reg1:
             st.markdown("#### Budget vs Satisfaction Client")
             st.markdown("*Cette analyse cherche à répondre à la question : un budget plus élevé garantit-il une meilleure satisfaction ?*")
@@ -423,7 +432,7 @@ with col2:
                     st.warning(f"⚠️ **Interprétation :** Le budget influence modérément la satisfaction (R²={r2:.2f}). D'autres facteurs comme la qualité du tissu ou le délai de confection jouent également un rôle.")
                 else:
                     st.info(f"ℹ️ **Interprétation :** Le budget seul n'explique pas la satisfaction (R²={r2:.2f}). La qualité du service et l'expérience globale priment sur le prix.")
-        
+
         with tab_reg2:
             st.markdown("#### Budget + Âge → Satisfaction")
             st.markdown("*Cette analyse combine deux variables (budget et âge) pour prédire la satisfaction. C'est une régression linéaire multiple.*")
@@ -433,7 +442,7 @@ with col2:
                 modele = LinearRegression()
                 modele.fit(X, y)
                 y_pred = modele.predict(X)
-                
+
                 coef_df = pd.DataFrame({'Variable': ['Budget', 'Âge'], 'Coefficient': modele.coef_})
                 st.dataframe(coef_df)
                 st.markdown("*Les coefficients indiquent l'impact de chaque variable sur la satisfaction. Un coefficient positif signifie que la variable augmente la satisfaction.*")
@@ -445,7 +454,7 @@ with col2:
                     st.info("ℹ️ D'autres variables (délai, type de tissu) pourraient améliorer le modèle.")
             else:
                 st.info("Données insuffisantes pour une régression multiple (besoin d'au moins 5 commandes).")
-    
+
     elif st.session_state['section'] == 'pca':
         st.markdown("### 🎯 PCA - Analyse en Composantes Principales")
         st.markdown("*La PCA est une technique de réduction de dimensionnalité. Elle permet de visualiser des données complexes en 2 dimensions tout en conservant l'essentiel de l'information.*")
@@ -462,7 +471,7 @@ with col2:
             st.markdown("*Chaque point représente une cliente. Les clientes proches ont des profils similaires. Les couleurs indiquent l'atelier d'origine.*")
         else:
             st.info("Données insuffisantes pour une PCA (besoin d'au moins 5 commandes).")
-    
+
     elif st.session_state['section'] == 'classification':
         st.markdown("### 🏷️ Classification Supervisée")
         st.markdown("*La classification supervisée permet de prédire une catégorie (ici, la recommandation) à partir de variables explicatives (budget, âge, satisfaction).*")
@@ -490,7 +499,7 @@ with col2:
                     st.warning("❌ Le modèle prédit que cette cliente NE RECOMMANDERAIT PAS la Maison Becca.")
         else:
             st.info("Données insuffisantes pour une classification (besoin d'au moins 10 commandes).")
-    
+
     elif st.session_state['section'] == 'clustering':
         st.markdown("### 🔄 Clustering - Segmentation Clientèle")
         st.markdown("*Le clustering (ou segmentation) est une technique non supervisée qui regroupe automatiquement les clientes ayant des profils similaires.*")
