@@ -1,7 +1,6 @@
 # ==============================================
 # ✨ BECCA STYLE & DESIGN ✨
 # Haute Couture & Créations
-# Plateforme d'Analyse de Données
 # TOUBIWO ANGE REBECCA
 # ==============================================
 
@@ -9,13 +8,6 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import plotly.express as px
-from sklearn.linear_model import LinearRegression
-from sklearn.preprocessing import StandardScaler
-from sklearn.decomposition import PCA
-from sklearn.cluster import KMeans
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.metrics import r2_score
 import os
 from datetime import datetime
 
@@ -26,7 +18,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# -------------------- CSS SIMPLE ET PROPRE --------------------
+# -------------------- CSS --------------------
 st.markdown("""
     <style>
     .stApp {
@@ -37,7 +29,6 @@ st.markdown("""
         font-family: 'Georgia', serif !important;
         text-align: center !important;
         font-size: 3.2rem !important;
-        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
     }
     h3, .stSubheader {
         color: #4A3728 !important;
@@ -51,15 +42,10 @@ st.markdown("""
         border-radius: 8px !important;
         padding: 8px 12px !important;
     }
-    .stButton > button:hover {
-        transform: scale(1.02) !important;
-        box-shadow: 0 6px 20px rgba(128,0,32,0.4) !important;
-    }
     [data-testid="stMetric"] {
         background: #FFF5F5 !important;
         border-radius: 15px !important;
         padding: 20px !important;
-        box-shadow: 0 6px 20px rgba(128,0,32,0.2) !important;
         border: 1px solid #CD5C5C !important;
         border-left: 6px solid #800020 !important;
     }
@@ -75,19 +61,14 @@ st.markdown("""
         background: white !important;
         border-radius: 20px !important;
         padding: 30px !important;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.1) !important;
         border: 1px solid #F0E0E0 !important;
     }
     .comment-box {
         background: #FFF5F5 !important;
         padding: 15px;
         border-radius: 10px;
-        margin: 10px 0;
         border-left: 4px solid #800020;
         color: #4A3728 !important;
-    }
-    p, span, div, label {
-        color: #333333 !important;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -119,15 +100,6 @@ with st.sidebar:
 # -------------------- TITRE --------------------
 st.title("BECCA STYLE & DESIGN")
 st.markdown("### Gestion des Ateliers de Haute Couture")
-st.markdown("*Cette plateforme permet de collecter les commandes des 5 ateliers et de fournir des analyses approfondies pour aider la direction à prendre des décisions stratégiques.*")
-
-st.markdown("""
-    <div style="text-align: center; display: flex; align-items: center; justify-content: center; gap: 10px; margin: 20px 0;">
-        <hr style="flex: 1; border: 0.5px solid #800020; opacity: 0.3;">
-        <span style="color: #800020; font-size: 1.2rem;">✦</span>
-        <hr style="flex: 1; border: 0.5px solid #800020; opacity: 0.3;">
-    </div>
-""", unsafe_allow_html=True)
 
 # -------------------- CHEMIN DU FICHIER --------------------
 DATA_FILE = os.path.join("data", "commandes_couture.csv")
@@ -175,87 +147,65 @@ col1, col2 = st.columns([1, 2])
 # ==============================================
 with col1:
     st.subheader("📝 Nouvelle Commande")
-    st.markdown("*Remplissez ce formulaire pour chaque cliente. Une cliente peut commander jusqu'à 3 tenues à la fois.*")
 
     with st.form("formulaire_commande", clear_on_submit=True):
-        atelier = st.selectbox("Atelier de prise en charge", ATELIERS)
+        atelier = st.selectbox("Atelier", ATELIERS)
         prenom = st.text_input("Nom de la cliente", placeholder="Ex: Marie")
-        age = st.number_input("Âge de la cliente", min_value=15, max_value=90, value=30, step=1)
-
-        st.markdown("---")
-        st.markdown("### Tenues commandées")
-        st.markdown("*Sélectionnez le nombre de tenues que la cliente souhaite commander.*")
+        age = st.number_input("Âge", min_value=15, max_value=90, value=30, step=1)
 
         nb_tenues = st.selectbox("Nombre de tenues", [1, 2, 3], index=0)
 
-        st.markdown("**Tenue 1** *(obligatoire)*")
+        st.markdown("**Tenue 1**")
         type_tenue1 = st.selectbox("Type de tenue", TYPES_TENUES, key="t1")
-        tissu1 = st.selectbox("Tissu principal", TISSUS, key="tis1")
+        tissu1 = st.selectbox("Tissu", TISSUS, key="tis1")
         budget1 = st.number_input("Budget (FCFA)", min_value=10000, max_value=2000000, value=150000, step=10000, key="b1")
-        delai1 = st.number_input("Délai de confection (jours)", min_value=1, max_value=90, value=14, step=1, key="d1")
+        delai1 = st.number_input("Délai (jours)", min_value=1, max_value=90, value=14, step=1, key="d1")
 
         if nb_tenues >= 2:
             st.markdown("**Tenue 2**")
             type_tenue2 = st.selectbox("Type de tenue", TYPES_TENUES, key="t2")
-            tissu2 = st.selectbox("Tissu principal", TISSUS, key="tis2")
+            tissu2 = st.selectbox("Tissu", TISSUS, key="tis2")
             budget2 = st.number_input("Budget (FCFA)", min_value=10000, max_value=2000000, value=150000, step=10000, key="b2")
-            delai2 = st.number_input("Délai de confection (jours)", min_value=1, max_value=90, value=14, step=1, key="d2")
+            delai2 = st.number_input("Délai (jours)", min_value=1, max_value=90, value=14, step=1, key="d2")
 
         if nb_tenues >= 3:
             st.markdown("**Tenue 3**")
             type_tenue3 = st.selectbox("Type de tenue", TYPES_TENUES, key="t3")
-            tissu3 = st.selectbox("Tissu principal", TISSUS, key="tis3")
+            tissu3 = st.selectbox("Tissu", TISSUS, key="tis3")
             budget3 = st.number_input("Budget (FCFA)", min_value=10000, max_value=2000000, value=150000, step=10000, key="b3")
-            delai3 = st.number_input("Délai de confection (jours)", min_value=1, max_value=90, value=14, step=1, key="d3")
+            delai3 = st.number_input("Délai (jours)", min_value=1, max_value=90, value=14, step=1, key="d3")
 
-        st.markdown("---")
-        st.markdown("### Retour de la cliente")
-        satisfaction = st.slider("Niveau de satisfaction (1 = très insatisfaite, 5 = très satisfaite)", 1, 5, 4)
-        recommandation = st.radio("La cliente recommanderait-elle la Maison Becca ?", ["Oui", "Non"], horizontal=True)
+        satisfaction = st.slider("Satisfaction (1 à 5)", 1, 5, 4)
+        recommandation = st.radio("Recommanderait ?", ["Oui", "Non"], horizontal=True)
 
-        if st.form_submit_button("💾 Enregistrer la commande"):
+        if st.form_submit_button("💾 Enregistrer"):
             if prenom == "":
-                st.error("❌ Veuillez entrer le nom de la cliente.")
+                st.error("Le nom est requis.")
             else:
                 nouvelle = pd.DataFrame([{
                     "date": datetime.now().strftime("%Y-%m-%d %H:%M"), "atelier": atelier, "prenom": prenom,
                     "age": age, "type_tenue": type_tenue1, "tissu": tissu1, "budget": budget1,
                     "delai": delai1, "satisfaction": satisfaction, "recommandation": recommandation
                 }])
-
                 if nb_tenues >= 2:
-                    nouvelle2 = pd.DataFrame([{
-                        "date": datetime.now().strftime("%Y-%m-%d %H:%M"), "atelier": atelier, "prenom": prenom,
-                        "age": age, "type_tenue": type_tenue2, "tissu": tissu2, "budget": budget2,
-                        "delai": delai2, "satisfaction": satisfaction, "recommandation": recommandation
-                    }])
-                    nouvelle = pd.concat([nouvelle, nouvelle2], ignore_index=True)
-
+                    n2 = pd.DataFrame([{"date": datetime.now().strftime("%Y-%m-%d %H:%M"), "atelier": atelier, "prenom": prenom, "age": age, "type_tenue": type_tenue2, "tissu": tissu2, "budget": budget2, "delai": delai2, "satisfaction": satisfaction, "recommandation": recommandation}])
+                    nouvelle = pd.concat([nouvelle, n2], ignore_index=True)
                 if nb_tenues >= 3:
-                    nouvelle3 = pd.DataFrame([{
-                        "date": datetime.now().strftime("%Y-%m-%d %H:%M"), "atelier": atelier, "prenom": prenom,
-                        "age": age, "type_tenue": type_tenue3, "tissu": tissu3, "budget": budget3,
-                        "delai": delai3, "satisfaction": satisfaction, "recommandation": recommandation
-                    }])
-                    nouvelle = pd.concat([nouvelle, nouvelle3], ignore_index=True)
-
+                    n3 = pd.DataFrame([{"date": datetime.now().strftime("%Y-%m-%d %H:%M"), "atelier": atelier, "prenom": prenom, "age": age, "type_tenue": type_tenue3, "tissu": tissu3, "budget": budget3, "delai": delai3, "satisfaction": satisfaction, "recommandation": recommandation}])
+                    nouvelle = pd.concat([nouvelle, n3], ignore_index=True)
                 sauvegarder_commande(nouvelle)
-                st.success(f"✅ Commande de {prenom} enregistrée ({nb_tenues} tenue(s)).")
+                st.success(f"✅ {prenom} enregistrée ({nb_tenues} tenue(s))")
 
-    # --- BOUTON D'ANNULATION ---
+    # --- ANNULATION ---
     if os.path.exists(DATA_FILE):
         df_data = pd.read_csv(DATA_FILE)
         if not df_data.empty:
             st.markdown("---")
             st.markdown("### ⚠️ Zone de correction")
-            st.markdown("*En cas d'erreur, vous pouvez annuler la dernière commande enregistrée.*")
             derniere = df_data.iloc[-1]
             st.markdown(f"""
                 <div style="background-color: #FFF3CD; border: 1px solid #FFC107; border-radius: 10px; padding: 15px; color: #856404;">
-                    <b>⚠️ Dernière commande :</b><br>
-                    <b>Cliente :</b> {derniere['prenom']}<br>
-                    <b>Tenue :</b> {derniere['type_tenue']}<br>
-                    <b>Atelier :</b> {derniere['atelier']}
+                    <b>Dernière commande :</b> {derniere['prenom']} - {derniere['type_tenue']} ({derniere['atelier']})
                 </div>
             """, unsafe_allow_html=True)
             if st.button("🗑️ Annuler cette commande", use_container_width=True):
@@ -265,40 +215,39 @@ with col1:
                 st.rerun()
 
 # ==============================================
-# PARTIE DROITE : ANALYSE
+# PARTIE DROITE : ANALYSE DESCRIPTIVE
 # ==============================================
 with col2:
-    st.subheader("📊 Analyse des Données")
-    st.markdown("*Tableau de bord d'aide à la décision pour la Direction de la Maison Becca.*")
+    st.subheader("📊 Analyse Descriptive des Données")
 
     df = charger_donnees()
 
     if mode_demo:
-        st.success("🟢 Mode démonstration activé – 20 commandes exemples affichées.")
+        st.success("🟢 Mode démo activé – 20 commandes exemples.")
         df = pd.DataFrame([
-            {"date":"2026-04-01 10:00","atelier":"Douala - Bonapriso","prenom":"Marie","age":28,"type_tenue":"Robe de mariée","tissu":"Dentelle de Calais","budget":450000,"delai":30,"satisfaction":5,"recommandation":"Oui"},
-            {"date":"2026-04-02 11:00","atelier":"Douala - Bonapriso","prenom":"Jeanne","age":35,"type_tenue":"Tailleur femme","tissu":"Lin","budget":85000,"delai":10,"satisfaction":4,"recommandation":"Oui"},
-            {"date":"2026-04-03 12:00","atelier":"Douala - Bonapriso","prenom":"Carine","age":22,"type_tenue":"Robe de cocktail","tissu":"Satin","budget":120000,"delai":14,"satisfaction":5,"recommandation":"Oui"},
-            {"date":"2026-04-04 13:00","atelier":"Douala - Bonapriso","prenom":"Sandrine","age":31,"type_tenue":"Robe de soirée longue","tissu":"Soie sauvage","budget":195000,"delai":21,"satisfaction":5,"recommandation":"Oui"},
-            {"date":"2026-04-05 10:30","atelier":"Yaoundé - Bastos","prenom":"Paul","age":40,"type_tenue":"Costume homme","tissu":"Coton égyptien","budget":150000,"delai":21,"satisfaction":4,"recommandation":"Oui"},
-            {"date":"2026-04-06 11:30","atelier":"Yaoundé - Bastos","prenom":"Chantal","age":31,"type_tenue":"Kaba Ngondo","tissu":"Wax haut de gamme","budget":95000,"delai":7,"satisfaction":3,"recommandation":"Non"},
-            {"date":"2026-04-07 12:30","atelier":"Yaoundé - Bastos","prenom":"Sylvie","age":45,"type_tenue":"Boubou africain","tissu":"Bazin riche","budget":200000,"delai":14,"satisfaction":5,"recommandation":"Oui"},
-            {"date":"2026-04-08 13:30","atelier":"Yaoundé - Bastos","prenom":"Thomas","age":33,"type_tenue":"Costume de marié","tissu":"Soie sauvage","budget":350000,"delai":28,"satisfaction":4,"recommandation":"Oui"},
-            {"date":"2026-04-09 10:00","atelier":"Bafoussam - Centre","prenom":"Pauline","age":50,"type_tenue":"Sanja","tissu":"Tissu traditionnel (Ndop, Obom)","budget":110000,"delai":10,"satisfaction":5,"recommandation":"Oui"},
-            {"date":"2026-04-10 11:00","atelier":"Bafoussam - Centre","prenom":"Alice","age":27,"type_tenue":"Robe de soirée longue","tissu":"Velours","budget":175000,"delai":21,"satisfaction":4,"recommandation":"Oui"},
-            {"date":"2026-04-11 12:00","atelier":"Bafoussam - Centre","prenom":"Roger","age":55,"type_tenue":"Costume homme","tissu":"Lin","budget":130000,"delai":14,"satisfaction":3,"recommandation":"Oui"},
-            {"date":"2026-04-12 13:00","atelier":"Bafoussam - Centre","prenom":"Brigitte","age":47,"type_tenue":"Ensemble jupe + bustier","tissu":"Wax haut de gamme","budget":135000,"delai":10,"satisfaction":4,"recommandation":"Oui"},
-            {"date":"2026-04-13 10:30","atelier":"Limbé - Bord de mer","prenom":"Estelle","age":29,"type_tenue":"Robe d'été","tissu":"Coton égyptien","budget":65000,"delai":7,"satisfaction":5,"recommandation":"Oui"},
-            {"date":"2026-04-14 11:30","atelier":"Limbé - Bord de mer","prenom":"Flora","age":38,"type_tenue":"Ensemble pagne wax","tissu":"Wax haut de gamme","budget":90000,"delai":10,"satisfaction":4,"recommandation":"Oui"},
-            {"date":"2026-04-15 12:30","atelier":"Limbé - Bord de mer","prenom":"Marc","age":42,"type_tenue":"Chemise sur mesure","tissu":"Lin","budget":45000,"delai":5,"satisfaction":5,"recommandation":"Oui"},
-            {"date":"2026-04-16 13:30","atelier":"Limbé - Bord de mer","prenom":"Nadine","age":25,"type_tenue":"Robe de cocktail","tissu":"Mousseline","budget":105000,"delai":12,"satisfaction":5,"recommandation":"Oui"},
-            {"date":"2026-04-17 10:00","atelier":"Garoua - Centre ville","prenom":"Aïcha","age":26,"type_tenue":"Boubou africain","tissu":"Bazin riche","budget":220000,"delai":14,"satisfaction":5,"recommandation":"Oui"},
-            {"date":"2026-04-18 11:00","atelier":"Garoua - Centre ville","prenom":"Mariam","age":34,"type_tenue":"Tenue de mariage traditionnel","tissu":"Tissu traditionnel (Ndop, Obom)","budget":300000,"delai":30,"satisfaction":4,"recommandation":"Oui"},
-            {"date":"2026-04-19 12:00","atelier":"Garoua - Centre ville","prenom":"Fati","age":42,"type_tenue":"Accessoire de luxe","tissu":"Soie sauvage","budget":45000,"delai":5,"satisfaction":5,"recommandation":"Oui"},
-            {"date":"2026-04-20 13:00","atelier":"Garoua - Centre ville","prenom":"Ousmane","age":38,"type_tenue":"Boubou africain","tissu":"Bazin riche","budget":250000,"delai":21,"satisfaction":5,"recommandation":"Oui"},
+            {"date":"2026-04-01","atelier":"Douala - Bonapriso","prenom":"Marie","age":28,"type_tenue":"Robe de mariée","tissu":"Dentelle de Calais","budget":450000,"delai":30,"satisfaction":5,"recommandation":"Oui"},
+            {"date":"2026-04-02","atelier":"Douala - Bonapriso","prenom":"Jeanne","age":35,"type_tenue":"Tailleur femme","tissu":"Lin","budget":85000,"delai":10,"satisfaction":4,"recommandation":"Oui"},
+            {"date":"2026-04-03","atelier":"Douala - Bonapriso","prenom":"Carine","age":22,"type_tenue":"Robe de cocktail","tissu":"Satin","budget":120000,"delai":14,"satisfaction":5,"recommandation":"Oui"},
+            {"date":"2026-04-04","atelier":"Douala - Bonapriso","prenom":"Sandrine","age":31,"type_tenue":"Robe de soirée longue","tissu":"Soie sauvage","budget":195000,"delai":21,"satisfaction":5,"recommandation":"Oui"},
+            {"date":"2026-04-05","atelier":"Yaoundé - Bastos","prenom":"Paul","age":40,"type_tenue":"Costume homme","tissu":"Coton égyptien","budget":150000,"delai":21,"satisfaction":4,"recommandation":"Oui"},
+            {"date":"2026-04-06","atelier":"Yaoundé - Bastos","prenom":"Chantal","age":31,"type_tenue":"Kaba Ngondo","tissu":"Wax haut de gamme","budget":95000,"delai":7,"satisfaction":3,"recommandation":"Non"},
+            {"date":"2026-04-07","atelier":"Yaoundé - Bastos","prenom":"Sylvie","age":45,"type_tenue":"Boubou africain","tissu":"Bazin riche","budget":200000,"delai":14,"satisfaction":5,"recommandation":"Oui"},
+            {"date":"2026-04-08","atelier":"Yaoundé - Bastos","prenom":"Thomas","age":33,"type_tenue":"Costume de marié","tissu":"Soie sauvage","budget":350000,"delai":28,"satisfaction":4,"recommandation":"Oui"},
+            {"date":"2026-04-09","atelier":"Bafoussam - Centre","prenom":"Pauline","age":50,"type_tenue":"Sanja","tissu":"Tissu traditionnel","budget":110000,"delai":10,"satisfaction":5,"recommandation":"Oui"},
+            {"date":"2026-04-10","atelier":"Bafoussam - Centre","prenom":"Alice","age":27,"type_tenue":"Robe de soirée longue","tissu":"Velours","budget":175000,"delai":21,"satisfaction":4,"recommandation":"Oui"},
+            {"date":"2026-04-11","atelier":"Bafoussam - Centre","prenom":"Roger","age":55,"type_tenue":"Costume homme","tissu":"Lin","budget":130000,"delai":14,"satisfaction":3,"recommandation":"Oui"},
+            {"date":"2026-04-12","atelier":"Bafoussam - Centre","prenom":"Brigitte","age":47,"type_tenue":"Ensemble jupe + bustier","tissu":"Wax haut de gamme","budget":135000,"delai":10,"satisfaction":4,"recommandation":"Oui"},
+            {"date":"2026-04-13","atelier":"Limbé - Bord de mer","prenom":"Estelle","age":29,"type_tenue":"Robe d'été","tissu":"Coton égyptien","budget":65000,"delai":7,"satisfaction":5,"recommandation":"Oui"},
+            {"date":"2026-04-14","atelier":"Limbé - Bord de mer","prenom":"Flora","age":38,"type_tenue":"Ensemble pagne wax","tissu":"Wax haut de gamme","budget":90000,"delai":10,"satisfaction":4,"recommandation":"Oui"},
+            {"date":"2026-04-15","atelier":"Limbé - Bord de mer","prenom":"Marc","age":42,"type_tenue":"Chemise sur mesure","tissu":"Lin","budget":45000,"delai":5,"satisfaction":5,"recommandation":"Oui"},
+            {"date":"2026-04-16","atelier":"Limbé - Bord de mer","prenom":"Nadine","age":25,"type_tenue":"Robe de cocktail","tissu":"Mousseline","budget":105000,"delai":12,"satisfaction":5,"recommandation":"Oui"},
+            {"date":"2026-04-17","atelier":"Garoua - Centre ville","prenom":"Aïcha","age":26,"type_tenue":"Boubou africain","tissu":"Bazin riche","budget":220000,"delai":14,"satisfaction":5,"recommandation":"Oui"},
+            {"date":"2026-04-18","atelier":"Garoua - Centre ville","prenom":"Mariam","age":34,"type_tenue":"Tenue de mariage traditionnel","tissu":"Tissu traditionnel","budget":300000,"delai":30,"satisfaction":4,"recommandation":"Oui"},
+            {"date":"2026-04-19","atelier":"Garoua - Centre ville","prenom":"Fati","age":42,"type_tenue":"Accessoire de luxe","tissu":"Soie sauvage","budget":45000,"delai":5,"satisfaction":5,"recommandation":"Oui"},
+            {"date":"2026-04-20","atelier":"Garoua - Centre ville","prenom":"Ousmane","age":38,"type_tenue":"Boubou africain","tissu":"Bazin riche","budget":250000,"delai":21,"satisfaction":5,"recommandation":"Oui"},
         ])
     elif df.empty:
-        st.info("Aucune commande enregistrée. Remplissez le formulaire ou activez le mode démo.")
+        st.info("Aucune commande. Remplissez le formulaire ou activez le mode démo.")
 
     # ----- INDICATEURS -----
     st.markdown("#### Indicateurs de Performance")
@@ -312,9 +261,9 @@ with col2:
             st.metric("Budget Moyen", "0 FCFA")
     with m3:
         if 'satisfaction' in df.columns and len(df) > 0:
-            st.metric("Satisfaction Moyenne", f"{df['satisfaction'].mean():.1f}/5")
+            st.metric("Satisfaction", f"{df['satisfaction'].mean():.1f}/5")
         else:
-            st.metric("Satisfaction Moyenne", "N/A")
+            st.metric("Satisfaction", "N/A")
     with m4:
         if 'recommandation' in df.columns and len(df) > 0:
             taux = (df['recommandation'] == "Oui").mean() * 100
@@ -324,157 +273,70 @@ with col2:
 
     st.markdown("""
         <div class="comment-box">
-            <b>📊 Interprétation :</b> Ces indicateurs offrent une vue d'ensemble de la performance 
-            de la Maison Becca. Un taux de recommandation élevé (>80%) indique que les clientes sont 
-            satisfaites et susceptibles de revenir.
+            <b>📊 Interprétation :</b> Ces indicateurs résument l'activité des 5 ateliers.
+            Un taux de recommandation élevé (>80%) indique des clientes satisfaites et fidèles.
         </div>
     """, unsafe_allow_html=True)
 
     st.markdown("---")
 
-    # ----- ONGLETS NATIFS -----
-    tab1, tab2, tab3, tab4, tab5 = st.tabs([
-        "📊 Tendances", "📈 Régression", "🎯 PCA", "🏷️ Classification", "🔄 Clustering"
-    ])
+    # ----- GRAPHIQUES DESCRIPTIFS -----
+    st.markdown("### 📊 Analyse Descriptive")
 
-    with tab1:
-        st.markdown("### 📊 Tendances & Camemberts")
-        colA, colB = st.columns(2)
-        with colA:
-            st.markdown("#### Top 5 des Tissus")
-            top_tissus = df['tissu'].value_counts().head(5)
-            if len(top_tissus) > 0:
-                fig1, ax1 = plt.subplots(figsize=(5, 5))
-                couleurs = ['#800020', '#CD5C5C', '#D4A574', '#8B6F47', '#6B8E23']
-                ax1.pie(top_tissus.values, labels=top_tissus.index, autopct='%1.1f%%', colors=couleurs)
-                st.pyplot(fig1)
-        with colB:
-            st.markdown("#### Top 5 des Tenues")
-            top_tenues = df['type_tenue'].value_counts().head(5)
-            if len(top_tenues) > 0:
-                fig2, ax2 = plt.subplots(figsize=(5, 5))
-                couleurs = ['#800020', '#CD5C5C', '#D4A574', '#8B6F47', '#6B8E23']
-                ax2.pie(top_tenues.values, labels=top_tenues.index, autopct='%1.1f%%', colors=couleurs)
-                st.pyplot(fig2)
-        st.markdown("#### Performance des Ateliers")
-        colC, colD = st.columns(2)
-        with colC:
-            st.markdown("##### Satisfaction par Atelier")
-            satisf_atelier = df.groupby('atelier')['satisfaction'].mean().sort_values(ascending=False)
-            fig4, ax4 = plt.subplots(figsize=(5, 4))
+    colA, colB = st.columns(2)
+    with colA:
+        st.markdown("#### Top 5 des Tissus")
+        top_tissus = df['tissu'].value_counts().head(5)
+        if len(top_tissus) > 0:
+            fig1, ax1 = plt.subplots(figsize=(5, 5))
             couleurs = ['#800020', '#CD5C5C', '#D4A574', '#8B6F47', '#6B8E23']
-            bars = ax4.bar(satisf_atelier.index, satisf_atelier.values, color=couleurs)
-            ax4.set_ylabel('Satisfaction (/5)')
-            ax4.set_ylim(0, 5)
-            plt.xticks(rotation=45, ha='right')
-            for bar, val in zip(bars, satisf_atelier.values):
-                ax4.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.05, f'{val:.1f}', ha='center', fontweight='bold')
-            st.pyplot(fig4)
-        with colD:
-            st.markdown("##### Commandes par Atelier")
-            cmd_atelier = df['atelier'].value_counts()
-            fig5, ax5 = plt.subplots(figsize=(5, 4))
-            bars = ax5.bar(cmd_atelier.index, cmd_atelier.values, color=couleurs[:len(cmd_atelier)])
-            ax5.set_ylabel('Nombre de Commandes')
-            plt.xticks(rotation=45, ha='right')
-            for bar, val in zip(bars, cmd_atelier.values):
-                ax5.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.1, str(val), ha='center', fontweight='bold')
-            st.pyplot(fig5)
-        st.markdown("#### Données Brutes")
-        df_affiche = df.sort_values('date', ascending=False).reset_index(drop=True)
-        df_affiche.index = df_affiche.index + 1
-        st.dataframe(df_affiche, use_container_width=True)
-        csv = df.to_csv(index=False).encode('utf-8')
-        st.download_button("📥 Télécharger (CSV)", data=csv, file_name='becca_export.csv', mime='text/csv')
+            ax1.pie(top_tissus.values, labels=top_tissus.index, autopct='%1.1f%%', colors=couleurs)
+            st.pyplot(fig1)
 
-    with tab2:
-        st.markdown("### 📈 Régression Linéaire")
-        tab_reg1, tab_reg2 = st.tabs(["Régression Simple", "Régression Multiple"])
-        with tab_reg1:
-            st.markdown("#### Budget vs Satisfaction Client")
-            fig, ax = plt.subplots(figsize=(8, 4))
-            x = df['budget'].values
-            y = df['satisfaction'].values
-            ax.scatter(x, y, alpha=0.6, color='#800020', s=80)
-            if len(x) > 1:
-                A = np.vstack([x, np.ones(len(x))]).T
-                pente, intercept = np.linalg.lstsq(A, y, rcond=None)[0]
-                ax.plot(x, pente * x + intercept, color='red', linewidth=2)
-                y_pred = pente * x + intercept
-                ss_res = np.sum((y - y_pred) ** 2)
-                ss_tot = np.sum((y - np.mean(y)) ** 2)
-                r2 = 1 - (ss_res / ss_tot)
-                ax.set_title(f"R² = {r2:.3f}")
-            st.pyplot(fig)
-            if len(x) > 1 and r2 > 0.3:
-                st.success(f"✅ Corrélation détectée (R²={r2:.2f})")
-            elif len(x) > 1:
-                st.info(f"ℹ️ Corrélation faible (R²={r2:.2f})")
-        with tab_reg2:
-            st.markdown("#### Budget + Âge → Satisfaction")
-            if len(df) >= 5:
-                X = df[['budget', 'age']].values
-                y = df['satisfaction'].values
-                modele = LinearRegression()
-                modele.fit(X, y)
-                y_pred = modele.predict(X)
-                coef_df = pd.DataFrame({'Variable': ['Budget', 'Âge'], 'Coefficient': modele.coef_})
-                st.dataframe(coef_df)
-                st.metric("R²", f"{r2_score(y, y_pred):.3f}")
-            else:
-                st.info("Données insuffisantes.")
+    with colB:
+        st.markdown("#### Top 5 des Tenues")
+        top_tenues = df['type_tenue'].value_counts().head(5)
+        if len(top_tenues) > 0:
+            fig2, ax2 = plt.subplots(figsize=(5, 5))
+            couleurs = ['#800020', '#CD5C5C', '#D4A574', '#8B6F47', '#6B8E23']
+            ax2.pie(top_tenues.values, labels=top_tenues.index, autopct='%1.1f%%', colors=couleurs)
+            st.pyplot(fig2)
 
-    with tab3:
-        st.markdown("### 🎯 PCA - Analyse en Composantes Principales")
-        if len(df) >= 5:
-            features = ['budget', 'age', 'satisfaction', 'delai']
-            scaler = StandardScaler()
-            X_scaled = scaler.fit_transform(df[features].dropna())
-            pca = PCA(n_components=2)
-            pca_result = pca.fit_transform(X_scaled)
-            df_pca = pd.DataFrame({'PC1': pca_result[:, 0], 'PC2': pca_result[:, 1], 'Atelier': df['atelier'].values[:len(pca_result)]})
-            fig = px.scatter(df_pca, x='PC1', y='PC2', color='Atelier', title=f"PCA (PC1: {pca.explained_variance_ratio_[0]*100:.0f}%, PC2: {pca.explained_variance_ratio_[1]*100:.0f}%)")
-            st.plotly_chart(fig, use_container_width=True, key="pca_chart")
-        else:
-            st.info("Données insuffisantes.")
+    st.markdown("---")
+    st.markdown("#### Performance des Ateliers")
 
-    with tab4:
-        st.markdown("### 🏷️ Classification Supervisée")
-        if len(df) >= 10:
-            df['cible'] = (df['recommandation'] == 'Oui').astype(int)
-            X = df[['budget', 'age', 'satisfaction']].values
-            y = df['cible'].values
-            rf = RandomForestClassifier(n_estimators=50, random_state=42)
-            rf.fit(X, y)
-            importance = pd.DataFrame({'Variable': ['Budget', 'Âge', 'Satisfaction'], 'Importance': rf.feature_importances_})
-            fig = px.bar(importance, x='Importance', y='Variable', orientation='h')
-            st.plotly_chart(fig, use_container_width=True, key="importance_chart")
-            st.subheader("🔮 Testez le modèle")
-            test_budget = st.number_input("Budget (FCFA)", value=150000)
-            test_age = st.slider("Âge", 15, 90, 30)
-            test_sat = st.slider("Satisfaction", 1, 5, 4)
-            if st.button("Prédire"):
-                pred = rf.predict([[test_budget, test_age, test_sat]])[0]
-                st.success("✅ Recommanderait") if pred == 1 else st.warning("❌ Ne recommanderait pas")
-        else:
-            st.info("Données insuffisantes.")
+    colC, colD = st.columns(2)
+    with colC:
+        st.markdown("##### Satisfaction par Atelier")
+        satisf_atelier = df.groupby('atelier')['satisfaction'].mean().sort_values(ascending=False)
+        fig4, ax4 = plt.subplots(figsize=(5, 4))
+        couleurs = ['#800020', '#CD5C5C', '#D4A574', '#8B6F47', '#6B8E23']
+        bars = ax4.bar(satisf_atelier.index, satisf_atelier.values, color=couleurs)
+        ax4.set_ylabel('Satisfaction (/5)')
+        ax4.set_ylim(0, 5)
+        plt.xticks(rotation=45, ha='right')
+        for bar, val in zip(bars, satisf_atelier.values):
+            ax4.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.05, f'{val:.1f}', ha='center', fontweight='bold')
+        st.pyplot(fig4)
 
-    with tab5:
-        st.markdown("### 🔄 Clustering - Segmentation Clientèle")
-        if len(df) >= 8:
-            features = ['budget', 'age', 'satisfaction']
-            scaler = StandardScaler()
-            X = scaler.fit_transform(df[features].dropna())
-            k = st.slider("Nombre de segments", 2, 4, 3)
-            kmeans = KMeans(n_clusters=k, random_state=42, n_init=10)
-            clusters = kmeans.fit_predict(X)
-            df['Segment'] = clusters[:len(df)]
-            fig = px.scatter(df, x='budget', y='satisfaction', color=clusters.astype(str), title=f"Segmentation en {k} groupes")
-            st.plotly_chart(fig, use_container_width=True, key="clustering_chart")
-            st.subheader("📋 Profil des segments")
-            st.dataframe(df.groupby('Segment')[['budget', 'age', 'satisfaction']].mean())
-        else:
-            st.info("Données insuffisantes.")
+    with colD:
+        st.markdown("##### Commandes par Atelier")
+        cmd_atelier = df['atelier'].value_counts()
+        fig5, ax5 = plt.subplots(figsize=(5, 4))
+        bars = ax5.bar(cmd_atelier.index, cmd_atelier.values, color=couleurs[:len(cmd_atelier)])
+        ax5.set_ylabel('Nombre de Commandes')
+        plt.xticks(rotation=45, ha='right')
+        for bar, val in zip(bars, cmd_atelier.values):
+            ax5.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.1, str(val), ha='center', fontweight='bold')
+        st.pyplot(fig5)
+
+    st.markdown("---")
+    st.markdown("#### Données Brutes")
+    df_affiche = df.sort_values('date', ascending=False).reset_index(drop=True)
+    df_affiche.index = df_affiche.index + 1
+    st.dataframe(df_affiche, use_container_width=True)
+    csv = df.to_csv(index=False).encode('utf-8')
+    st.download_button("📥 Télécharger (CSV)", data=csv, file_name='becca_export.csv', mime='text/csv')
 
 # -------------------- CITATION --------------------
 st.markdown("---")
