@@ -218,7 +218,7 @@ with col1:
 # PARTIE DROITE : ANALYSE DESCRIPTIVE
 # ==============================================
 with col2:
-    st.subheader("📊 Analyse Descriptive des Données")
+    st.subheader("📊 Analyse des Données")
 
     df = charger_donnees()
 
@@ -271,72 +271,91 @@ with col2:
         else:
             st.metric("Recommandation", "N/A")
 
-    st.markdown("""
-        <div class="comment-box">
-            <b>📊 Interprétation :</b> Ces indicateurs résument l'activité des 5 ateliers.
-            Un taux de recommandation élevé (>80%) indique des clientes satisfaites et fidèles.
-        </div>
-    """, unsafe_allow_html=True)
-
     st.markdown("---")
 
-    # ----- GRAPHIQUES DESCRIPTIFS -----
-    st.markdown("### 📊 Analyse Descriptive")
+    # ----- ONGLETS -----
+    tab1, tab2, tab3 = st.tabs(["📊 Tendances", "📈 Corrélation", "📋 Données Brutes"])
 
-    colA, colB = st.columns(2)
-    with colA:
-        st.markdown("#### Top 5 des Tissus")
-        top_tissus = df['tissu'].value_counts().head(5)
-        if len(top_tissus) > 0:
-            fig1, ax1 = plt.subplots(figsize=(5, 5))
+    with tab1:
+        st.markdown("### 📊 Tendances & Camemberts")
+        colA, colB = st.columns(2)
+        with colA:
+            st.markdown("#### Top 5 des Tissus")
+            top_tissus = df['tissu'].value_counts().head(5)
+            if len(top_tissus) > 0:
+                fig1, ax1 = plt.subplots(figsize=(5, 5))
+                couleurs = ['#800020', '#CD5C5C', '#D4A574', '#8B6F47', '#6B8E23']
+                ax1.pie(top_tissus.values, labels=top_tissus.index, autopct='%1.1f%%', colors=couleurs)
+                st.pyplot(fig1)
+        with colB:
+            st.markdown("#### Top 5 des Tenues")
+            top_tenues = df['type_tenue'].value_counts().head(5)
+            if len(top_tenues) > 0:
+                fig2, ax2 = plt.subplots(figsize=(5, 5))
+                couleurs = ['#800020', '#CD5C5C', '#D4A574', '#8B6F47', '#6B8E23']
+                ax2.pie(top_tenues.values, labels=top_tenues.index, autopct='%1.1f%%', colors=couleurs)
+                st.pyplot(fig2)
+
+        st.markdown("---")
+        st.markdown("#### Performance des Ateliers")
+        colC, colD = st.columns(2)
+        with colC:
+            st.markdown("##### Satisfaction par Atelier")
+            satisf_atelier = df.groupby('atelier')['satisfaction'].mean().sort_values(ascending=False)
+            fig4, ax4 = plt.subplots(figsize=(5, 4))
             couleurs = ['#800020', '#CD5C5C', '#D4A574', '#8B6F47', '#6B8E23']
-            ax1.pie(top_tissus.values, labels=top_tissus.index, autopct='%1.1f%%', colors=couleurs)
-            st.pyplot(fig1)
+            bars = ax4.bar(satisf_atelier.index, satisf_atelier.values, color=couleurs)
+            ax4.set_ylabel('Satisfaction (/5)')
+            ax4.set_ylim(0, 5)
+            plt.xticks(rotation=45, ha='right')
+            for bar, val in zip(bars, satisf_atelier.values):
+                ax4.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.05, f'{val:.1f}', ha='center', fontweight='bold')
+            st.pyplot(fig4)
+        with colD:
+            st.markdown("##### Commandes par Atelier")
+            cmd_atelier = df['atelier'].value_counts()
+            fig5, ax5 = plt.subplots(figsize=(5, 4))
+            bars = ax5.bar(cmd_atelier.index, cmd_atelier.values, color=couleurs[:len(cmd_atelier)])
+            ax5.set_ylabel('Nombre de Commandes')
+            plt.xticks(rotation=45, ha='right')
+            for bar, val in zip(bars, cmd_atelier.values):
+                ax5.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.1, str(val), ha='center', fontweight='bold')
+            st.pyplot(fig5)
 
-    with colB:
-        st.markdown("#### Top 5 des Tenues")
-        top_tenues = df['type_tenue'].value_counts().head(5)
-        if len(top_tenues) > 0:
-            fig2, ax2 = plt.subplots(figsize=(5, 5))
-            couleurs = ['#800020', '#CD5C5C', '#D4A574', '#8B6F47', '#6B8E23']
-            ax2.pie(top_tenues.values, labels=top_tenues.index, autopct='%1.1f%%', colors=couleurs)
-            st.pyplot(fig2)
+    with tab2:
+        st.markdown("### 📈 Corrélation : Budget vs Satisfaction")
+        st.markdown("*Cette analyse montre si un budget plus élevé est lié à une meilleure satisfaction client.*")
+        fig, ax = plt.subplots(figsize=(8, 4))
+        x = df['budget'].values
+        y = df['satisfaction'].values
+        ax.scatter(x, y, alpha=0.6, color='#800020', s=80)
+        ax.set_xlabel("Budget (FCFA)")
+        ax.set_ylabel("Satisfaction")
+        if len(x) > 1:
+            A = np.vstack([x, np.ones(len(x))]).T
+            pente, intercept = np.linalg.lstsq(A, y, rcond=None)[0]
+            ax.plot(x, pente * x + intercept, color='red', linewidth=2)
+            y_pred = pente * x + intercept
+            ss_res = np.sum((y - y_pred) ** 2)
+            ss_tot = np.sum((y - np.mean(y)) ** 2)
+            r2 = 1 - (ss_res / ss_tot)
+            ax.set_title(f"R² = {r2:.3f} | y = {pente:.6f}x + {intercept:.2f}")
+        st.pyplot(fig)
+        if len(x) > 1:
+            st.markdown("""
+                <div class="comment-box">
+                    <b>📊 Interprétation :</b> Le R² mesure la force du lien entre budget et satisfaction.
+                    Plus il est proche de 1, plus le budget influence la satisfaction.
+                </div>
+            """, unsafe_allow_html=True)
 
-    st.markdown("---")
-    st.markdown("#### Performance des Ateliers")
-
-    colC, colD = st.columns(2)
-    with colC:
-        st.markdown("##### Satisfaction par Atelier")
-        satisf_atelier = df.groupby('atelier')['satisfaction'].mean().sort_values(ascending=False)
-        fig4, ax4 = plt.subplots(figsize=(5, 4))
-        couleurs = ['#800020', '#CD5C5C', '#D4A574', '#8B6F47', '#6B8E23']
-        bars = ax4.bar(satisf_atelier.index, satisf_atelier.values, color=couleurs)
-        ax4.set_ylabel('Satisfaction (/5)')
-        ax4.set_ylim(0, 5)
-        plt.xticks(rotation=45, ha='right')
-        for bar, val in zip(bars, satisf_atelier.values):
-            ax4.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.05, f'{val:.1f}', ha='center', fontweight='bold')
-        st.pyplot(fig4)
-
-    with colD:
-        st.markdown("##### Commandes par Atelier")
-        cmd_atelier = df['atelier'].value_counts()
-        fig5, ax5 = plt.subplots(figsize=(5, 4))
-        bars = ax5.bar(cmd_atelier.index, cmd_atelier.values, color=couleurs[:len(cmd_atelier)])
-        ax5.set_ylabel('Nombre de Commandes')
-        plt.xticks(rotation=45, ha='right')
-        for bar, val in zip(bars, cmd_atelier.values):
-            ax5.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.1, str(val), ha='center', fontweight='bold')
-        st.pyplot(fig5)
-
-    st.markdown("---")
-    st.markdown("#### Données Brutes")
-    df_affiche = df.sort_values('date', ascending=False).reset_index(drop=True)
-    df_affiche.index = df_affiche.index + 1
-    st.dataframe(df_affiche, use_container_width=True)
-    csv = df.to_csv(index=False).encode('utf-8')
-    st.download_button("📥 Télécharger (CSV)", data=csv, file_name='becca_export.csv', mime='text/csv')
+    with tab3:
+        st.markdown("### 📋 Données Brutes")
+        df_affiche = df.sort_values('date', ascending=False).reset_index(drop=True)
+        df_affiche.index = df_affiche.index + 1
+        st.dataframe(df_affiche, use_container_width=True)
+        csv = df.to_csv(index=False).encode('utf-8')
+        st.download_button("📥 Télécharger (CSV)", data=csv, file_name='becca_export.csv', mime='text/csv')
 
 # -------------------- CITATION --------------------
 st.markdown("---")
